@@ -53,7 +53,7 @@ public class GameService {
 
         // anledningen att detta är en boolean är för att vi vill veta om svängen
         // lyckades.
-        return null;
+        return true;
     }
 
     public Map<String, GameRoom> tick(String gameRoomId) {
