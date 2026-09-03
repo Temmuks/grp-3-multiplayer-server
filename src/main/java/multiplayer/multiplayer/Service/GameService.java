@@ -21,9 +21,9 @@ public class GameService {
         this.gameController = gameController;
     }
 
-    public boolean updatePlayerDirection(String playerId, String direction, String gameRommId) {
+    public boolean updatePlayerDirection(String playerId, String direction, String gameRoomId) {
 
-        Player player = getPlayerById(playerId, gameRommId);
+        Player player = getPlayerById(playerId, gameRoomId);
 
         if (player.getDirection().equals("right") && direction.equals("left")
                 || player.getDirection().equals("left") && direction.equals("right")
