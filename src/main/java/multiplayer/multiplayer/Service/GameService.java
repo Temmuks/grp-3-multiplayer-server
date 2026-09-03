@@ -25,14 +25,11 @@ public class GameService {
 
         Player player = getPlayerById(playerId, gameRoomId);
 
-        if (player.getDirection().equals("right") && direction.equals("left")
-                || player.getDirection().equals("left") && direction.equals("right")
-                || player.getDirection().equals("up") && direction.equals("down") ||
-                player.getDirection().equals("down") && direction.equals("up")) {
-            return false;
-        } else {
+        if (!checkTurnUnavaiable(direction, player.getDirection())) {
             player.setDirection(direction);
             return true;
+        } else {
+            return false;
         }
 
         // hantera logik för att svänga, ta imot spelaren valda riktning samt spelarens
@@ -42,6 +39,15 @@ public class GameService {
         // Anledning till att detta är en boolean är för att vi skall retunera false om
         // spelaren inte kan göra den valda svängen pga t.ex att man kör south och vill
         // svänga north
+    }
+
+    // Kollar om spelaren kan svänga åt valt håll, förhindrar att man kan svänga
+    // motsatt riktning imot vad man redan kör
+    private boolean checkTurnUnavaiable(String turnDirection, String currentDirection) {
+        return currentDirection.equals("right") && turnDirection.equals("left")
+                || currentDirection.equals("left") && turnDirection.equals("right")
+                || currentDirection.equals("up") && turnDirection.equals("down")
+                || currentDirection.equals("down") && turnDirection.equals("up");
     }
 
     public boolean applyMovement(Player player) {
