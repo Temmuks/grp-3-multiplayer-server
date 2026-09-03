@@ -25,11 +25,11 @@ public class GameService {
 
         Player player = getPlayerById(playerId, gameRommId);
 
-        if (checkTurnAvaiability(direction, player.getDirection())) {
-            return false;
-        } else {
+        if (!checkTurnUnavaiable(direction, player.getDirection())) {
             player.setDirection(direction);
             return true;
+        } else {
+            return false;
         }
 
         // hantera logik för att svänga, ta imot spelaren valda riktning samt spelarens
@@ -43,7 +43,7 @@ public class GameService {
 
     // Kollar om spelaren kan svänga åt valt håll, förhindrar att man kan svänga
     // motsatt riktning imot vad man redan kör
-    private boolean checkTurnAvaiability(String turnDirection, String currentDirection) {
+    private boolean checkTurnUnavaiable(String turnDirection, String currentDirection) {
         return currentDirection.equals("right") && turnDirection.equals("left")
                 || currentDirection.equals("left") && turnDirection.equals("right")
                 || currentDirection.equals("up") && turnDirection.equals("down")
