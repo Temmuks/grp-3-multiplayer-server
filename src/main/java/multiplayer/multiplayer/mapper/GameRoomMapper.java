@@ -1,4 +1,4 @@
-package multiplayer.mapper;
+package multiplayer.multiplayer.mapper;
 
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.model.GameRoom;
