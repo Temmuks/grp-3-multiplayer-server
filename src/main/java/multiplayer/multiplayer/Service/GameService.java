@@ -1,6 +1,5 @@
 package multiplayer.multiplayer.Service;
 
-import multiplayer.multiplayer.controller.GameController;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 
@@ -16,10 +15,7 @@ public class GameService {
 
     List<GameRoom> gameRooms = new ArrayList<>();
 
-    private final GameController gameController;
-
-    GameService(GameController gameController) {
-        this.gameController = gameController;
+    GameService() {        
     }
 
     public boolean updatePlayerDirection(String playerId, String direction, String gameRoomId) {
