@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameService {
 
-    List<GameRoom> gameRoomsList = new ArrayList<>();
+    List<GameRoom> gameRoomList = new ArrayList<>();
 
     private final GameController gameController;
 
@@ -75,7 +75,7 @@ public class GameService {
     }
 
     public GameRoom getGameRoomById(String gameRoomId) {
-        GameRoom gameRoomById = gameRoomsList.stream().filter(gr -> gr.getGameRoomId().equals(gameRoomId)).findFirst()
+        GameRoom gameRoomById = gameRoomList.stream().filter(gr -> gr.getGameRoomId().equals(gameRoomId)).findFirst()
                 .orElseThrow();
         return gameRoomById;
     }
@@ -96,7 +96,7 @@ public class GameService {
         String gameRoomId = UUID.randomUUID().toString();
         gameRoom.setGameRoomId(gameRoomId);
 
-        gameRoomsList.add(gameRoom);
+        gameRoomList.add(gameRoom);
         return gameRoom;
     }
 }
