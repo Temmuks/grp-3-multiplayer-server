@@ -7,13 +7,14 @@ import multiplayer.multiplayer.model.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 @Service
 public class GameService {
 
-    List<GameRoom> gameRooms = new ArrayList<>();
+    List<GameRoom> gameRoomList = new ArrayList<>();
 
     private final GameController gameController;
 
@@ -74,7 +75,7 @@ public class GameService {
     }
 
     public GameRoom getGameRoomById(String gameRoomId) {
-        GameRoom gameRoomById = gameRooms.stream().filter(gr -> gr.getGameRoomId().equals(gameRoomId)).findFirst()
+        GameRoom gameRoomById = gameRoomList.stream().filter(gr -> gr.getGameRoomId().equals(gameRoomId)).findFirst()
                 .orElseThrow();
         return gameRoomById;
     }
@@ -87,5 +88,15 @@ public class GameService {
         Player player = players.get(playerId);
 
         return player;
+    }
+
+    public GameRoom createGameRoom() {
+        GameRoom gameRoom = new GameRoom();
+
+        String gameRoomId = UUID.randomUUID().toString();
+        gameRoom.setGameRoomId(gameRoomId);
+
+        gameRoomList.add(gameRoom);
+        return gameRoom;
     }
 }
