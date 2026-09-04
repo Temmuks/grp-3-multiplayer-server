@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 @Service
 public class GameService {
 
-    private List<GameRoom> gameRooms = new ArrayList<>();
+    private List<GameRoom> gameRoomList = new ArrayList<>();
 
     GameService() {        
     }
@@ -73,7 +74,7 @@ public class GameService {
     }
 
     public GameRoom getGameRoomById(String gameRoomId) {
-        GameRoom gameRoomById = gameRooms.stream().filter(gr -> gr.getGameRoomId().equals(gameRoomId)).findFirst()
+        GameRoom gameRoomById = gameRoomList.stream().filter(gr -> gr.getGameRoomId().equals(gameRoomId)).findFirst()
                 .orElseThrow();
         return gameRoomById;
     }
@@ -89,6 +90,16 @@ public class GameService {
     }
 
     public List<GameRoom> getAllGameRooms(){
-        return gameRooms;
+        return gameRoomList;
+    }
+  
+    public GameRoom createGameRoom() {
+        GameRoom gameRoom = new GameRoom();
+
+        String gameRoomId = UUID.randomUUID().toString();
+        gameRoom.setGameRoomId(gameRoomId);
+
+        gameRoomList.add(gameRoom);
+        return gameRoom;
     }
 }
