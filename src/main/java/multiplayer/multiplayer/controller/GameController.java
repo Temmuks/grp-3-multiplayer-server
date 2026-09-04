@@ -2,8 +2,12 @@ package multiplayer.multiplayer.controller;
 
 import org.springframework.stereotype.Controller;
 
+import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.Service.GameService;
-import multiplayer.multiplayer.model.Player;
+import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
+import multiplayer.multiplayer.model.GameRoom;
+
+import java.util.List;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -11,11 +15,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 @Controller
 public class GameController {
-    private SimpMessagingTemplate messsagingTemplate;
+    private SimpMessagingTemplate messagingTemplate;
     private GameService gameService;
 
-    public GameController(SimpMessagingTemplate messsagingTemplate, GameService gameService) {
-        this.messsagingTemplate = messsagingTemplate;
+    public GameController(SimpMessagingTemplate messagingTemplate, GameService gameService) {
+        this.messagingTemplate = messagingTemplate;
         this.gameService = gameService;
     }
 
@@ -32,11 +36,15 @@ public class GameController {
     @Scheduled(fixedRate = 500)
     public void broadcastGameRoomList(){
         // get all gamerooms
+        List<GameRoom> gameRooms = gameService.getAllGameRooms();
 
         // convert into displayable format (dont send entire gamerooms)
-
+        List<GameRoomDisplayDTO> DTOs = gameRooms.stream()
+            .map(GameRoomMapper::toDisplayDTO)
+            .toList();
+        
         // send to subscribers of /topic/gamerooms
-        messsagingTemplate.convertAndSend("/topic/gamerooms", "här ska finnas list av gamerooms i ngn form av DTO");
+        messagingTemplate.convertAndSend("/topic/gamerooms", DTOs);
     }
 
     // Hanterar logik för att svänga med sin mask

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameService {
 
-    List<GameRoom> gameRooms = new ArrayList<>();
+    private List<GameRoom> gameRooms = new ArrayList<>();
 
     GameService() {        
     }
@@ -86,5 +86,9 @@ public class GameService {
         Player player = players.get(playerId);
 
         return player;
+    }
+
+    public List<GameRoom> getAllGameRooms(){
+        return gameRooms;
     }
 }
