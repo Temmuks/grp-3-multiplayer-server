@@ -5,6 +5,7 @@ import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,12 +66,14 @@ public class GameService {
     public Map<String, GameRoom> tick(String gameRoomId) {
 
         // Returnera map med alla spelare i gameroomets positioner
+        return new HashMap<String, GameRoom>(); // temporär return för att kunna sätta igång servern
 
     }
 
     private boolean hasPlayerColided(Player player, GameRoom gameRoom) {
         // kolla om spelare har krockat igenom att kolla spelarens position är och
         // jämför med befintliga positioner i gameRoomets lista
+        return false; // temporär return för att kunna sätta igång servern
     }
 
     public GameRoom getGameRoomById(String gameRoomId) {

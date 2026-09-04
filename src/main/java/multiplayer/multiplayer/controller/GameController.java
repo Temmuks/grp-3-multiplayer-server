@@ -34,7 +34,7 @@ public class GameController {
     public void turn(String playerId, String direction, String gameRoomId) {
         boolean turnSucessful = gameService.updatePlayerDirection(playerId, direction, gameRoomId);
         if (turnSucessful) {
-            turn(player);
+            // turn(player);
         }
     }
 
