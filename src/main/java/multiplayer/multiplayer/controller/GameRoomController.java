@@ -19,7 +19,7 @@ public class GameRoomController {
         this.gameService = gameService;
     }
 
-    @PostMapping("/createGameRoom")
+    @PostMapping("/gameRooms")
     public GameRoom createGameRoom() {
         return gameService.createGameRoom();
     }
