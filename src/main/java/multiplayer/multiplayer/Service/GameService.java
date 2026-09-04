@@ -1,10 +1,10 @@
 package multiplayer.multiplayer.Service;
 
-import multiplayer.multiplayer.controller.GameController;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -14,12 +14,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameService {
 
-    List<GameRoom> gameRoomList = new ArrayList<>();
+    private List<GameRoom> gameRoomList = new ArrayList<>();
 
-    private final GameController gameController;
-
-    GameService(GameController gameController) {
-        this.gameController = gameController;
+    GameService() {        
     }
 
     public boolean updatePlayerDirection(String playerId, String direction, String gameRoomId) {
@@ -66,12 +63,14 @@ public class GameService {
     public Map<String, GameRoom> tick(String gameRoomId) {
 
         // Returnera map med alla spelare i gameroomets positioner
+        return new HashMap<String, GameRoom>(); // temporär return för att kunna sätta igång servern
 
     }
 
     private boolean hasPlayerColided(Player player, GameRoom gameRoom) {
         // kolla om spelare har krockat igenom att kolla spelarens position är och
         // jämför med befintliga positioner i gameRoomets lista
+        return false; // temporär return för att kunna sätta igång servern
     }
 
     public GameRoom getGameRoomById(String gameRoomId) {
@@ -90,6 +89,10 @@ public class GameService {
         return player;
     }
 
+    public List<GameRoom> getAllGameRooms(){
+        return gameRoomList;
+    }
+  
     public GameRoom createGameRoom() {
         GameRoom gameRoom = new GameRoom();
 
