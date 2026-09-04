@@ -29,6 +29,16 @@ public class GameController {
 
     }
 
+    @Scheduled(fixedRate = 500)
+    public void broadcastGameRoomList(){
+        // get all gamerooms
+
+        // convert into displayable format (dont send entire gamerooms)
+
+        // send to subscribers of /topic/gamerooms
+        messsagingTemplate.convertAndSend("/topic/gamerooms", "här ska finnas list av gamerooms i ngn form av DTO");
+    }
+
     // Hanterar logik för att svänga med sin mask
     @MessageMapping("/turn")
     public void turn(String playerId, String direction, String gameRoomId) {
