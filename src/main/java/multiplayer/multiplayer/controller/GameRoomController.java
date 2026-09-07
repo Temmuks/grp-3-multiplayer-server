@@ -40,6 +40,7 @@ public class GameRoomController {
     @PostMapping("/join/{gameRoomId}")
     public String joinGameRoom(@PathVariable String gameRoomId) {
         Player player = new Player();
+        gameService.asignColorToPlayer(player, gameRoomId);
         gameService.addNewPlayer(player, gameRoomId);
         return player.getPlayerId();
     }
