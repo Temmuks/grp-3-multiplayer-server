@@ -23,9 +23,7 @@ public class GameRoomController {
         this.gameService = gameService;
     }
 
-    // Skapar ett gameroom och knyter en ny spelare till det rummet, viktigt att vi
-    // i clienten knyter den till denna spelare genom att skapa en localstorage med
-    // Key: gameroomId och value: playerId
+    // Skapar Gameroom och knyter det till clientens ID
     @PostMapping("/gameRooms")
     public GameRoom createGameRoom(@RequestBody String clientId) {
         GameRoom gameRoom = gameService.createGameRoom();
@@ -34,6 +32,7 @@ public class GameRoomController {
     }
 
     // Ansluter till ett gameroom med en ny spelare
+    // Spara spelar Id i clienten som "currentPlayer"
     @PostMapping("/join/{gameRoomId}")
     public String joinGameRoom(@RequestParam("gameRoomId") String gameRoomId) {
         Player player = new Player();
