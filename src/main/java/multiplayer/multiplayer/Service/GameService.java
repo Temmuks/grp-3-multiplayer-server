@@ -8,20 +8,21 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import multiplayer.multiplayer.controller.GameController;
+import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
+import multiplayer.multiplayer.dto.PositionDTO;
+import multiplayer.multiplayer.enums.GameState;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 
 @Service
 public class GameService {
 
-    private final GameController gameController;
     private List<GameRoom> gameRoomList = new ArrayList<>();
 
-    GameService(GameController gameController) {
-        this.gameController = gameController;
+    GameService() {
     }
 
     public boolean updatePlayerDirection(String playerId, String direction, String gameRoomId) {
@@ -55,6 +56,38 @@ public class GameService {
 
     public boolean applyMovement(Player player) {
 
+        // Lever spelaren?
+        if(!player.isAlive()){
+            return false;
+        }
+
+        // Har spelaren kolliderat?
+        // if(hasPlayerColided(player, gameRoom)){
+        //     player.setAlive(false);
+        //     // När en spelare dör kan winner-läget ändras.
+        //     //ska fungera när vi löser kollisionslogiken.
+        // }
+
+        // Flytta spelaren
+        switch (player.getDirection()) {
+            case "up":
+                player.setCurrentY(player.getCurrentY()-1);
+                break;
+            case "down":
+                player.setCurrentY(player.getCurrentY()+1);
+                break;
+            case "left":
+                player.setCurrentX(player.getCurrentX()-1);
+                break;
+            case "right":
+                player.setCurrentX(player.getCurrentX()+1);
+                break;
+        
+            default:
+                break;
+        }
+
+
         // Kolla spelarens senaste postion och med hjälp av vald riktning
         // ändra nästa position och kolla om det blir en kollition med hjälp utav
         // hasPlayerColided(null)
@@ -65,28 +98,31 @@ public class GameService {
         return true;
     }
 
-    public Map<String, GameRoom> tick(String gameRoomId) {
+    public GameRoomUpdateDTO tick(String gameRoomId) {
+            // kolla att rummet är IN_PROGRESS
+            GameRoomUpdateDTO gameRoomUpdateDTO = new GameRoomUpdateDTO();
+
             // Hämtar rätt rum via gameRoomId och kör en tick för just det rummet.
             GameRoom gameRoom = getGameRoomById(gameRoomId);
 
+            gameRoomUpdateDTO.setGameRoomStatus(gameRoom.getGameRoomStatus());
+            // Applicera alla spelares nya positioner (inkl kolla kollisioner)
             for(Player player : gameRoom.getPlayers().values()) {
-                if(!player.isAlive()){
-                    continue;
-                }
-            
-            applyMovement(player);
+                applyMovement(player);
 
-            if(hasPlayerColided(player, gameRoom)){
-                player.setAlive(false);
-                // När en spelare dör kan winner-läget ändras.
-                //ska fungera när vi löser kollisionslogiken.
-                checkWinner(gameRoom);
-
+                gameRoomUpdateDTO.getPlayerPositions().put(
+                    new PositionDTO(player.getCurrentX(), player.getCurrentY()),
+                    player.getPlayerId()
+                );
             }
-        }
-            Map<String, GameRoom> result = new HashMap<>();
-            result.put(gameRoomId, gameRoom);
-            return result;
+
+            // Kolla om någon vinnare finns
+            if (checkWinner(gameRoom) != null){
+                gameRoomUpdateDTO.setGameRoomStatus(GameState.FINISHED);
+                // gameRoomUpdateDTO.setWinner(blabla)
+            }
+
+            return gameRoomUpdateDTO;
         // Returnera map med alla spelare i gameroomets positioner
     }
 
@@ -98,7 +134,11 @@ public class GameService {
 
     public Player checkWinner(GameRoom gameRoom) {
         // Avsluta direkyt om rummet redan är färdigspelat
-        if("FINISHED".equals(gameRoom.getGameRoomStatus())){
+        // if(GameState.FINISHED.equals(gameRoom.getGameRoomStatus())){
+        //     return null;
+        // }
+
+        if (!gameRoom.getGameRoomStatus().equals(GameState.IN_PROGRESS)){
             return null;
         }
         List<Player> alivePlayers = gameRoom.getPlayers().values().stream()
@@ -109,7 +149,7 @@ public class GameService {
             //och ändrar status på rummet till "FINISHED".
             Player winner = alivePlayers.get(0);
             gameRoom.setWinner(winner.getPlayerId());
-            gameRoom.setGameRoomStatus("FINISHED");
+            gameRoom.setGameRoomStatus(GameState.FINISHED);
             return winner;
         }
         return null;
@@ -150,6 +190,7 @@ public class GameService {
 
     public GameRoom createGameRoom() {
         GameRoom gameRoom = new GameRoom();
+        gameRoom.setGameRoomStatus(GameState.IN_PROGRESS);
 
         String gameRoomId = UUID.randomUUID().toString();
         gameRoom.setGameRoomId(gameRoomId);
@@ -179,6 +220,5 @@ public class GameService {
         gameRoom.getColors().remove(i);
 
         player.setColor(asignColor);
-
     }
 }

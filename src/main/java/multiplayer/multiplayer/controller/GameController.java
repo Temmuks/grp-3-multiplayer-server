@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.Service.GameService;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
+import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.model.GameRoom;
 
 import java.util.List;
@@ -27,9 +28,12 @@ public class GameController {
     @Scheduled(fixedRate = 60)
     public void gameTick() {
 
-        // gameService.tick();
+        gameService.getAllGameRooms().forEach(gameRoom -> {
+            GameRoomUpdateDTO gameRoomUpdateDTO = gameService.tick(gameRoom.getGameRoomId());
+            messagingTemplate.convertAndSend("/topic/game/" + gameRoom.getGameRoomId(), gameRoomUpdateDTO);
+            // System.out.println(gameRoomUpdateDTO);
+        });
 
-        // messagingTemplate.convertAndSend("/topic/game/{gameRoomId}")
 
     }
 
