@@ -1,15 +1,15 @@
 package multiplayer.multiplayer.model;
 
+import java.util.List;
 import java.util.UUID;
 
 public class Player {
     String playerId = UUID.randomUUID().toString();
 
     int currentX;
-
     int currentY;
 
-    String direction;
+    String direction = List.of("up","down","left","right").get((int) Math.round(Math.random()*4));
 
     boolean isAlive = true;
 
