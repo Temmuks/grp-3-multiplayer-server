@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import multiplayer.multiplayer.dto.PositionDTO;
+
 public class GameRoom {
 
     List<String> colors = new ArrayList<>(List.of("crimson",
@@ -26,6 +28,13 @@ public class GameRoom {
 
     String gameRoomId;
     Map<String, Player> players = new HashMap<>();
+
+    // Varje position som någon gång under spelets gång har upptagits av en spelare
+    // kommer att sparas här, där nyckeln är position som PositionDTO som består av
+    // x och y,
+    // och värdet är en String som är ett playerId. (kan exempelvis användas för att
+    // visa *vem* man kolliderat med)
+    Map<PositionDTO, String> previousPositions = new HashMap<>();
     int gridSize;
     String gameRoomStatus;
     int maxPlayers;
@@ -36,6 +45,7 @@ public class GameRoom {
         this.colors = colors;
         this.gameRoomId = gameRoomId;
         this.players = players;
+        this.previousPositions = new HashMap<>();
         this.gridSize = gridSize;
         this.gameRoomStatus = gameRoomStatus;
         this.maxPlayers = maxPlayers;
@@ -66,6 +76,14 @@ public class GameRoom {
 
     public void setPlayers(Map<String, Player> players) {
         this.players = players;
+    }
+
+    public Map<PositionDTO, String> getPreviousPositions() {
+        return previousPositions;
+    }
+
+    public void setPreviousPositions(Map<PositionDTO, String> previousPositions) {
+        this.previousPositions = previousPositions;
     }
 
     public int getGridSize() {
