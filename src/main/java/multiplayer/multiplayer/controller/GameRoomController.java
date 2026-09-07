@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import multiplayer.multiplayer.Service.GameService;
+import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +35,16 @@ public class GameRoomController {
         gameRoom.setGameRoomOwner(clientId);
         return gameRoom;
     }
+
+    // Test method for postman
+    // @GetMapping("/status")
+    // public GameRoomUpdateDTO getStatus() {
+    //     GameRoomUpdateDTO gameRoomUpdateDTO = new GameRoomUpdateDTO();
+    //     gameRoomUpdateDTO = gameService.tick(gameService.getAllGameRooms().get(0).getGameRoomId());
+    //     return gameRoomUpdateDTO;
+    // }
+    
+
 
     // Ansluter till ett gameroom med en ny spelare
     // Spara spelar Id i clienten som "currentPlayer"

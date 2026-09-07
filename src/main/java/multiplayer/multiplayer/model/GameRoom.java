@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import multiplayer.multiplayer.dto.PositionDTO;
+import multiplayer.multiplayer.enums.GameState;
 
 public class GameRoom {
 
@@ -36,13 +37,13 @@ public class GameRoom {
     // visa *vem* man kolliderat med)
     Map<PositionDTO, String> previousPositions = new HashMap<>();
     int gridSize;
-    String gameRoomStatus;
+    GameState gameRoomStatus = GameState.NOT_STARTED;
     int maxPlayers;
     String gameRoomOwner;
     String winner;
 
     public GameRoom(List<String> colors, String gameRoomId, Map<String, Player> players, int gridSize,
-            String gameRoomStatus, int maxPlayers) {
+            GameState gameRoomStatus, int maxPlayers) {
         this.colors = colors;
         this.gameRoomId = gameRoomId;
         this.players = players;
@@ -95,11 +96,11 @@ public class GameRoom {
         this.gridSize = gridSize;
     }
 
-    public String getGameRoomStatus() {
+    public GameState getGameRoomStatus() {
         return gameRoomStatus;
     }
 
-    public void setGameRoomStatus(String gameRoomStatus) {
+    public void setGameRoomStatus(GameState gameRoomStatus) {
         this.gameRoomStatus = gameRoomStatus;
     }
 
