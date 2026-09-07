@@ -1,8 +1,5 @@
 package multiplayer.multiplayer.Service;
 
-import multiplayer.multiplayer.model.GameRoom;
-import multiplayer.multiplayer.model.Player;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,12 +10,18 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import multiplayer.multiplayer.controller.GameController;
+import multiplayer.multiplayer.model.GameRoom;
+import multiplayer.multiplayer.model.Player;
+
 @Service
 public class GameService {
 
+    private final GameController gameController;
     private List<GameRoom> gameRoomList = new ArrayList<>();
 
-    GameService() {
+    GameService(GameController gameController) {
+        this.gameController = gameController;
     }
 
     public boolean updatePlayerDirection(String playerId, String direction, String gameRoomId) {
@@ -63,16 +66,66 @@ public class GameService {
     }
 
     public Map<String, GameRoom> tick(String gameRoomId) {
+            // Hämtar rätt rum via gameRoomId och kör en tick för just det rummet.
+            GameRoom gameRoom = getGameRoomById(gameRoomId);
 
+            for(Player player : gameRoom.getPlayers().values()) {
+                if(!player.isAlive()){
+                    continue;
+                }
+            
+            applyMovement(player);
+
+            if(hasPlayerColided(player, gameRoom)){
+                player.setAlive(false);
+                // När en spelare dör kan winner-läget ändras.
+                //ska fungera när vi löser kollisionslogiken.
+                checkWinner(gameRoom);
+
+            }
+        }
+            Map<String, GameRoom> result = new HashMap<>();
+            result.put(gameRoomId, gameRoom);
+            return result;
         // Returnera map med alla spelare i gameroomets positioner
-        return new HashMap<String, GameRoom>(); // temporär return för att kunna sätta igång servern
-
     }
 
     private boolean hasPlayerColided(Player player, GameRoom gameRoom) {
         // kolla om spelare har krockat igenom att kolla spelarens position är och
         // jämför med befintliga positioner i gameRoomets lista
         return false; // temporär return för att kunna sätta igång servern
+    }
+
+    public Player checkWinner(GameRoom gameRoom) {
+        // Avsluta direkyt om rummet redan är färdigspelat
+        if("FINISHED".equals(gameRoom.getGameRoomStatus())){
+            return null;
+        }
+        List<Player> alivePlayers = gameRoom.getPlayers().values().stream()
+        .filter(Player::isAlive).toList();
+
+        if(alivePlayers.size() == 1) {
+            // om bara en spelare är kvar alive sätter vi winner som playerId på den spelöaren
+            //och ändrar status på rummet till "FINISHED".
+            Player winner = alivePlayers.get(0);
+            gameRoom.setWinner(winner.getPlayerId());
+            gameRoom.setGameRoomStatus("FINISHED");
+            return winner;
+        }
+        return null;
+    }
+
+    // Detta är lite till för att frontend bara behöver veta färgen på vinnaren typ
+    //Alltså ger färgen på vinnaren om den finns, finns den ej returneras null.
+    public String getWinnerColor(GameRoom gameRoom) {
+        String winnerId = gameRoom.getWinner();
+        if (winnerId != null) {
+            Player winnerPlayer = gameRoom.getPlayers().get(winnerId);
+            if (winnerPlayer != null) {
+                return winnerPlayer.getColor();
+            }
+        }
+        return null;
     }
 
     public GameRoom getGameRoomById(String gameRoomId) {
