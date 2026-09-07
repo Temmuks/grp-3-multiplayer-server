@@ -26,6 +26,7 @@ public class GameRoom {
     String gameRoomStatus;
     int maxPlayers;
     String gameRoomOwner;
+    String winner;
 
     public GameRoom(String[] colors, String gameRoomId, Map<String, Player> players, int gridSize,
             String gameRoomStatus, int maxPlayers) {
@@ -96,8 +97,15 @@ public class GameRoom {
         this.maxPlayers = maxPlayers;
     }
 
+    public String getWinner() {
+    return winner;
+    }
+
+    public void setWinner(String winner) {
+    this.winner = winner;
+    }
+
     // TBD
-    // String winner;
     // List Leaderboard;
 
 }
