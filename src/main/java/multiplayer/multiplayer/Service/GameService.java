@@ -16,7 +16,7 @@ public class GameService {
 
     private List<GameRoom> gameRoomList = new ArrayList<>();
 
-    GameService() {        
+    GameService() {
     }
 
     public boolean updatePlayerDirection(String playerId, String direction, String gameRoomId) {
@@ -89,10 +89,10 @@ public class GameService {
         return player;
     }
 
-    public List<GameRoom> getAllGameRooms(){
+    public List<GameRoom> getAllGameRooms() {
         return gameRoomList;
     }
-  
+
     public GameRoom createGameRoom() {
         GameRoom gameRoom = new GameRoom();
 
@@ -101,5 +101,10 @@ public class GameService {
 
         gameRoomList.add(gameRoom);
         return gameRoom;
+    }
+
+    public void addNewPlayer(Player player, String gameRoomId) {
+        GameRoom gameRoom = getGameRoomById(gameRoomId);
+        gameRoom.getPlayers().put(player.getPlayerId(), player);
     }
 }

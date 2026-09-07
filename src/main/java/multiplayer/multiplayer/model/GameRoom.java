@@ -25,7 +25,7 @@ public class GameRoom {
     int gridSize;
     String gameRoomStatus;
     int maxPlayers;
-    Player gameRoomOwner;
+    String gameRoomOwner;
 
     public GameRoom(String[] colors, String gameRoomId, Map<String, Player> players, int gridSize,
             String gameRoomStatus, int maxPlayers) {
@@ -40,11 +40,11 @@ public class GameRoom {
     public GameRoom() {
     }
 
-    public Player getGameRoomOwner() {
+    public String getGameRoomOwner() {
         return gameRoomOwner;
     }
 
-    public void setGameRoomOwner(Player gameRoomOwner) {
+    public void setGameRoomOwner(String gameRoomOwner) {
         this.gameRoomOwner = gameRoomOwner;
     }
 

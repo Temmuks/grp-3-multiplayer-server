@@ -8,5 +8,5 @@ public record GameRoomDisplayDTO(
         int maxPlayers,
         int gridSize,
         String gameRoomStatus,
-        Player gameRoomOwner) {
+        String gameRoomOwner) {
 }
