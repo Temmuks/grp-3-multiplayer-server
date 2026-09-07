@@ -1,5 +1,7 @@
 package multiplayer.multiplayer.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,8 @@ import multiplayer.multiplayer.Service.GameService;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 
@@ -34,10 +38,16 @@ public class GameRoomController {
     // Ansluter till ett gameroom med en ny spelare
     // Spara spelar Id i clienten som "currentPlayer"
     @PostMapping("/join/{gameRoomId}")
-    public String joinGameRoom(@RequestParam("gameRoomId") String gameRoomId) {
+    public String joinGameRoom(@PathVariable String gameRoomId) {
         Player player = new Player();
         gameService.addNewPlayer(player, gameRoomId);
         return player.getPlayerId();
+    }
+
+    // Används för postman, kan behövas i framtiden.
+    @GetMapping("/gameRooms")
+    public List<GameRoom> getMethodName() {
+        return gameService.getAllGameRooms();
     }
 
 }

@@ -33,6 +33,7 @@ public class GameController {
 
     }
 
+    // Todo: ta bort Scheduled och använd sendTo här istället
     @Scheduled(fixedRate = 500)
     public void broadcastGameRoomList() {
         // get all gamerooms
