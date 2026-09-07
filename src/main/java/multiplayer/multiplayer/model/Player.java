@@ -6,8 +6,8 @@ import java.util.UUID;
 public class Player {
     String playerId = UUID.randomUUID().toString();
 
-    int currentX;
-    int currentY;
+    int currentX = 0;
+    int currentY = 0;
 
     String direction = List.of("up","down","left","right").get((int) Math.round(Math.random()*4));
 
