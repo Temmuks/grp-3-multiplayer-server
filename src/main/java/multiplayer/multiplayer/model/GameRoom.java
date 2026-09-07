@@ -1,10 +1,14 @@
 package multiplayer.multiplayer.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameRoom {
-    String[] colors = { "crimson",
+
+    List<String> colors = new ArrayList<>(List.of("crimson",
             "royalblue",
             "limegreen",
             "darkorange",
@@ -18,7 +22,7 @@ public class GameRoom {
             "indigo",
             "tomato",
             "slategray",
-            "springgreen" };
+            "springgreen"));
 
     String gameRoomId;
     Map<String, Player> players = new HashMap<>();
@@ -27,7 +31,7 @@ public class GameRoom {
     int maxPlayers;
     String gameRoomOwner;
 
-    public GameRoom(String[] colors, String gameRoomId, Map<String, Player> players, int gridSize,
+    public GameRoom(List<String> colors, String gameRoomId, Map<String, Player> players, int gridSize,
             String gameRoomStatus, int maxPlayers) {
         this.colors = colors;
         this.gameRoomId = gameRoomId;
@@ -46,14 +50,6 @@ public class GameRoom {
 
     public void setGameRoomOwner(String gameRoomOwner) {
         this.gameRoomOwner = gameRoomOwner;
-    }
-
-    public String[] getColors() {
-        return colors;
-    }
-
-    public void setColors(String[] colors) {
-        this.colors = colors;
     }
 
     public String getGameRoomId() {
@@ -94,6 +90,14 @@ public class GameRoom {
 
     public void setMaxPlayers(int maxPlayers) {
         this.maxPlayers = maxPlayers;
+    }
+
+    public List<String> getColors() {
+        return colors;
+    }
+
+    public void setColors(List<String> colors) {
+        this.colors = colors;
     }
 
     // TBD

@@ -4,9 +4,11 @@ import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -106,5 +108,24 @@ public class GameService {
     public void addNewPlayer(Player player, String gameRoomId) {
         GameRoom gameRoom = getGameRoomById(gameRoomId);
         gameRoom.getPlayers().put(player.getPlayerId(), player);
+    }
+
+    // Hanterar färsättning utav spelare, när en spelare har fått sin färg plockas
+    // den bort ifrån listan av färger i gameroomet
+    // Referens till random position i listan:
+    // https://www.baeldung.com/java-random-list-element
+    public void asignColorToPlayer(Player player, String gameRoomId) {
+        GameRoom gameRoom = getGameRoomById(gameRoomId);
+
+        Random rand = new Random();
+
+        int i = rand.nextInt(gameRoom.getColors().size());
+
+        String asignColor = gameRoom.getColors().get(i);
+
+        gameRoom.getColors().remove(i);
+
+        player.setColor(asignColor);
+
     }
 }
