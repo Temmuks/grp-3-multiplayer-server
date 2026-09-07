@@ -33,16 +33,17 @@ public class GameController {
 
     }
 
+    // Todo: ta bort Scheduled och använd sendTo här istället
     @Scheduled(fixedRate = 500)
-    public void broadcastGameRoomList(){
+    public void broadcastGameRoomList() {
         // get all gamerooms
         List<GameRoom> gameRooms = gameService.getAllGameRooms();
 
         // convert into displayable format (dont send entire gamerooms)
         List<GameRoomDisplayDTO> DTOs = gameRooms.stream()
-            .map(GameRoomMapper::toDisplayDTO)
-            .toList();
-        
+                .map(GameRoomMapper::toDisplayDTO)
+                .toList();
+
         // send to subscribers of /topic/gamerooms
         messagingTemplate.convertAndSend("/topic/gamerooms", DTOs);
     }

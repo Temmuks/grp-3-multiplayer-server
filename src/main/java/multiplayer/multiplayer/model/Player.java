@@ -1,7 +1,9 @@
 package multiplayer.multiplayer.model;
 
+import java.util.UUID;
+
 public class Player {
-    String playerId;
+    String playerId = UUID.randomUUID().toString();
 
     int currentX;
 
@@ -9,7 +11,7 @@ public class Player {
 
     String direction;
 
-    boolean isAlive;
+    boolean isAlive = true;
 
     String color;
 
