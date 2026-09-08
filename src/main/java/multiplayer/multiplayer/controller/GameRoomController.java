@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import multiplayer.multiplayer.Service.GameService;
+import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.dto.GameRoomJoinDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
@@ -33,8 +34,8 @@ public class GameRoomController {
 
     // Skapar Gameroom och knyter det till clientens ID
     @PostMapping("/gameRooms")
-    public GameRoomDisplayDTO createGameRoom(@RequestBody String clientId, int maxPlayers) {
-        GameRoom gameRoom = gameService.createGameRoom(clientId, maxPlayers);
+    public GameRoomDisplayDTO createGameRoom(@RequestBody CreateGameRoomDTO createGameRoomDTO) {
+        GameRoom gameRoom = gameService.createGameRoom(createGameRoomDTO);
         GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper.toDisplayDTO(gameRoom);
         return gameRoomDisplayDTO;
     }
