@@ -57,7 +57,7 @@ public class GameRoomController {
         gameService.asignColorToPlayer(player, gameRoomId);
         gameService.addNewPlayer(player, gameRoomId);
         GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper.toDisplayDTO(gameService.getGameRoomById(gameRoomId));
-        GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(gameRoomId, gameRoomDisplayDTO);
+        GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), gameRoomDisplayDTO);
         return gameRoomJoinDTO;
     }
 
