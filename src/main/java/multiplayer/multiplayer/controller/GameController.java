@@ -34,7 +34,6 @@ public class GameController {
             // System.out.println(gameRoomUpdateDTO);
         });
 
-
     }
 
     // Todo: ta bort Scheduled och använd sendTo här istället

@@ -6,10 +6,10 @@ import java.util.UUID;
 public class Player {
     String playerId = UUID.randomUUID().toString();
 
-    int currentX = 0;
-    int currentY = 0;
+    int currentX = 50;
+    int currentY = 50;
 
-    String direction = List.of("up","down","left","right").get((int) (Math.random()*4));
+    String direction = List.of("up", "down", "left", "right").get((int) (Math.random() * 4));
 
     boolean isAlive = true;
 
