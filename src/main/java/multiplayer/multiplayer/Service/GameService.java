@@ -15,6 +15,7 @@ import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.PlayerUpdateDTO;
 import multiplayer.multiplayer.dto.PositionDTO;
+import multiplayer.multiplayer.dto.TurnDTO;
 import multiplayer.multiplayer.enums.GameState;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
@@ -27,12 +28,12 @@ public class GameService {
     GameService() {
     }
 
-    public boolean updatePlayerDirection(String playerId, String direction, String gameRoomId) {
+    public boolean updatePlayerDirection(TurnDTO turnDTO) {
 
-        Player player = getPlayerById(playerId, gameRoomId);
+        Player player = getPlayerById(turnDTO.getPlayerId(), turnDTO.getGameRoomId());
 
-        if (!checkTurnUnavaiable(direction, player.getDirection())) {
-            player.setDirection(direction);
+        if (!checkTurnUnavaiable(turnDTO.getDirection(), player.getDirection())) {
+            player.setDirection(turnDTO.getDirection());
             return true;
         } else {
             return false;
