@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.PositionDTO;
 import multiplayer.multiplayer.enums.GameState;
@@ -187,12 +188,12 @@ public class GameService {
         return gameRoomList;
     }
 
-    public GameRoom createGameRoom(String clientId, int maxPlayers) {
+    public GameRoom createGameRoom(CreateGameRoomDTO createGameRoomDTO) {
         GameRoom gameRoom = new GameRoom();
         gameRoom.setGameRoomStatus(GameState.NOT_STARTED);
-        gameRoom.setMaxPlayers(maxPlayers);
-        gameRoom.setGameRoomOwner(clientId);
-        gameRoom.setGridSize(maxPlayers * 64);// Sätter gridsize baserat på max antal spelare. 4 = 256, 10 = 640, 15 =
+        gameRoom.setMaxPlayers(createGameRoomDTO.getMaxPlayers());
+        gameRoom.setGameRoomOwner(createGameRoomDTO.getClientId());
+        gameRoom.setGridSize(createGameRoomDTO.getMaxPlayers() * 64);// Sätter gridsize baserat på max antal spelare. 4 = 256, 10 = 640, 15 =
                                               // 960 etc.
         String gameRoomId = UUID.randomUUID().toString();
         gameRoom.setGameRoomId(gameRoomId);
