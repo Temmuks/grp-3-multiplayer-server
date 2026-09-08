@@ -190,7 +190,7 @@ public class GameService {
 
     public GameRoom createGameRoom() {
         GameRoom gameRoom = new GameRoom();
-        gameRoom.setGameRoomStatus(GameState.IN_PROGRESS);
+        gameRoom.setGameRoomStatus(GameState.NOT_STARTED);
 
         String gameRoomId = UUID.randomUUID().toString();
         gameRoom.setGameRoomId(gameRoomId);
