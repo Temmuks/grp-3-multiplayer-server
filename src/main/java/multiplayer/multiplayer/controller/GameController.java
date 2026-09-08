@@ -6,6 +6,7 @@ import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.Service.GameService;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
+import multiplayer.multiplayer.dto.TurnDTO;
 import multiplayer.multiplayer.model.GameRoom;
 
 import java.util.List;
@@ -53,11 +54,8 @@ public class GameController {
 
     // Hanterar logik för att svänga med sin mask
     @MessageMapping("/turn")
-    public void turn(String playerId, String direction, String gameRoomId) {
-        boolean turnSucessful = gameService.updatePlayerDirection(playerId, direction, gameRoomId);
-        if (turnSucessful) {
-            // turn(player);
-        }
+    public void turn(TurnDTO turnDTO) {
+        gameService.updatePlayerDirection(turnDTO);
     }
 
 }
