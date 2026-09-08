@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
+import multiplayer.multiplayer.dto.PlayerUpdateDTO;
 import multiplayer.multiplayer.dto.PositionDTO;
 import multiplayer.multiplayer.enums.GameState;
 import multiplayer.multiplayer.model.GameRoom;
@@ -110,9 +111,17 @@ public class GameService {
         for (Player player : gameRoom.getPlayers().values()) {
             applyMovement(player);
 
-            gameRoomUpdateDTO.getPlayerPositions().put(
-                    new PositionDTO(player.getCurrentX(), player.getCurrentY()),
-                    player.getPlayerId());
+            PositionDTO positionDTO = new PositionDTO(player.getCurrentX(), player.getCurrentY());
+
+            PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getPlayerId(), player.getColor(), positionDTO);
+
+            gameRoomUpdateDTO.getPlayerUpdateDTOList().add(playerUpdateDTO);
+
+            // gameRoomUpdateDTO.getPlayerPositions().put(
+            // new PositionDTO(player.getCurrentX(), player.getCurrentY()),
+            // player.getPlayerId());
+            // gameRoomUpdateDTO.getPlayerColors().put(player.getPlayerId(),
+            // player.getColor());
         }
 
         // Kolla om någon vinnare finns
@@ -193,8 +202,9 @@ public class GameService {
         gameRoom.setGameRoomStatus(GameState.NOT_STARTED);
         gameRoom.setMaxPlayers(createGameRoomDTO.getMaxPlayers());
         gameRoom.setGameRoomOwner(createGameRoomDTO.getClientId());
-        gameRoom.setGridSize(createGameRoomDTO.getMaxPlayers() * 64);// Sätter gridsize baserat på max antal spelare. 4 = 256, 10 = 640, 15 =
-                                              // 960 etc.
+        gameRoom.setGridSize(createGameRoomDTO.getMaxPlayers() * 64);// Sätter gridsize baserat på max antal spelare. 4
+                                                                     // = 256, 10 = 640, 15 =
+        // 960 etc.
         String gameRoomId = UUID.randomUUID().toString();
         gameRoom.setGameRoomId(gameRoomId);
 

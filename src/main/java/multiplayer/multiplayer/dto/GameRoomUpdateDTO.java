@@ -1,25 +1,18 @@
 package multiplayer.multiplayer.dto;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import multiplayer.multiplayer.enums.GameState;
 
 public class GameRoomUpdateDTO {
-    Map<PositionDTO, String> playerPositions;
     GameState gameRoomStatus;
+    List<PlayerUpdateDTO> playerUpdateDTOList = new ArrayList<>();
 
-    public GameRoomUpdateDTO(){
+    public GameRoomUpdateDTO() {
         gameRoomStatus = GameState.NOT_STARTED;
-        playerPositions = new HashMap<>();
-    }
-
-    public Map<PositionDTO, String> getPlayerPositions() {
-        return playerPositions;
-    }
-
-    public void setPlayerPositions(Map<PositionDTO, String> playerPositions) {
-        this.playerPositions = playerPositions;
     }
 
     public GameState getGameRoomStatus() {
@@ -30,6 +23,12 @@ public class GameRoomUpdateDTO {
         this.gameRoomStatus = gameRoomStatus;
     }
 
+    public List<PlayerUpdateDTO> getPlayerUpdateDTOList() {
+        return playerUpdateDTOList;
+    }
 
+    public void setPlayerUpdateDTOList(List<PlayerUpdateDTO> playerUpdateDTOList) {
+        this.playerUpdateDTOList = playerUpdateDTOList;
+    }
 
 }
