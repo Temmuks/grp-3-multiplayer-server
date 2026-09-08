@@ -57,36 +57,35 @@ public class GameService {
     public boolean applyMovement(Player player) {
 
         // Lever spelaren?
-        if(!player.isAlive()){
+        if (!player.isAlive()) {
             return false;
         }
 
         // Har spelaren kolliderat?
         // if(hasPlayerColided(player, gameRoom)){
-        //     player.setAlive(false);
-        //     // När en spelare dör kan winner-läget ändras.
-        //     //ska fungera när vi löser kollisionslogiken.
+        // player.setAlive(false);
+        // // När en spelare dör kan winner-läget ändras.
+        // //ska fungera när vi löser kollisionslogiken.
         // }
 
         // Flytta spelaren
         switch (player.getDirection()) {
             case "up":
-                player.setCurrentY(player.getCurrentY()-1);
+                player.setCurrentY(player.getCurrentY() - 1);
                 break;
             case "down":
-                player.setCurrentY(player.getCurrentY()+1);
+                player.setCurrentY(player.getCurrentY() + 1);
                 break;
             case "left":
-                player.setCurrentX(player.getCurrentX()-1);
+                player.setCurrentX(player.getCurrentX() - 1);
                 break;
             case "right":
-                player.setCurrentX(player.getCurrentX()+1);
+                player.setCurrentX(player.getCurrentX() + 1);
                 break;
-        
+
             default:
                 break;
         }
-
 
         // Kolla spelarens senaste postion och med hjälp av vald riktning
         // ändra nästa position och kolla om det blir en kollition med hjälp utav
@@ -99,30 +98,29 @@ public class GameService {
     }
 
     public GameRoomUpdateDTO tick(String gameRoomId) {
-            // kolla att rummet är IN_PROGRESS
-            GameRoomUpdateDTO gameRoomUpdateDTO = new GameRoomUpdateDTO();
+        // kolla att rummet är IN_PROGRESS
+        GameRoomUpdateDTO gameRoomUpdateDTO = new GameRoomUpdateDTO();
 
-            // Hämtar rätt rum via gameRoomId och kör en tick för just det rummet.
-            GameRoom gameRoom = getGameRoomById(gameRoomId);
+        // Hämtar rätt rum via gameRoomId och kör en tick för just det rummet.
+        GameRoom gameRoom = getGameRoomById(gameRoomId);
 
-            gameRoomUpdateDTO.setGameRoomStatus(gameRoom.getGameRoomStatus());
-            // Applicera alla spelares nya positioner (inkl kolla kollisioner)
-            for(Player player : gameRoom.getPlayers().values()) {
-                applyMovement(player);
+        gameRoomUpdateDTO.setGameRoomStatus(gameRoom.getGameRoomStatus());
+        // Applicera alla spelares nya positioner (inkl kolla kollisioner)
+        for (Player player : gameRoom.getPlayers().values()) {
+            applyMovement(player);
 
-                gameRoomUpdateDTO.getPlayerPositions().put(
+            gameRoomUpdateDTO.getPlayerPositions().put(
                     new PositionDTO(player.getCurrentX(), player.getCurrentY()),
-                    player.getPlayerId()
-                );
-            }
+                    player.getPlayerId());
+        }
 
-            // Kolla om någon vinnare finns
-            if (checkWinner(gameRoom) != null){
-                gameRoomUpdateDTO.setGameRoomStatus(GameState.FINISHED);
-                // gameRoomUpdateDTO.setWinner(blabla)
-            }
+        // Kolla om någon vinnare finns
+        if (checkWinner(gameRoom) != null) {
+            gameRoomUpdateDTO.setGameRoomStatus(GameState.FINISHED);
+            // gameRoomUpdateDTO.setWinner(blabla)
+        }
 
-            return gameRoomUpdateDTO;
+        return gameRoomUpdateDTO;
         // Returnera map med alla spelare i gameroomets positioner
     }
 
@@ -135,18 +133,19 @@ public class GameService {
     public Player checkWinner(GameRoom gameRoom) {
         // Avsluta direkyt om rummet redan är färdigspelat
         // if(GameState.FINISHED.equals(gameRoom.getGameRoomStatus())){
-        //     return null;
+        // return null;
         // }
 
-        if (!gameRoom.getGameRoomStatus().equals(GameState.IN_PROGRESS)){
+        if (!gameRoom.getGameRoomStatus().equals(GameState.IN_PROGRESS)) {
             return null;
         }
         List<Player> alivePlayers = gameRoom.getPlayers().values().stream()
-        .filter(Player::isAlive).toList();
+                .filter(Player::isAlive).toList();
 
-        if(alivePlayers.size() == 1) {
-            // om bara en spelare är kvar alive sätter vi winner som playerId på den spelöaren
-            //och ändrar status på rummet till "FINISHED".
+        if (alivePlayers.size() == 1) {
+            // om bara en spelare är kvar alive sätter vi winner som playerId på den
+            // spelöaren
+            // och ändrar status på rummet till "FINISHED".
             Player winner = alivePlayers.get(0);
             gameRoom.setWinner(winner.getPlayerId());
             gameRoom.setGameRoomStatus(GameState.FINISHED);
@@ -156,7 +155,7 @@ public class GameService {
     }
 
     // Detta är lite till för att frontend bara behöver veta färgen på vinnaren typ
-    //Alltså ger färgen på vinnaren om den finns, finns den ej returneras null.
+    // Alltså ger färgen på vinnaren om den finns, finns den ej returneras null.
     public String getWinnerColor(GameRoom gameRoom) {
         String winnerId = gameRoom.getWinner();
         if (winnerId != null) {
@@ -188,10 +187,13 @@ public class GameService {
         return gameRoomList;
     }
 
-    public GameRoom createGameRoom() {
+    public GameRoom createGameRoom(String clientId, int maxPlayers) {
         GameRoom gameRoom = new GameRoom();
         gameRoom.setGameRoomStatus(GameState.NOT_STARTED);
-
+        gameRoom.setMaxPlayers(maxPlayers);
+        gameRoom.setGameRoomOwner(clientId);
+        gameRoom.setGridSize(maxPlayers * 64);// Sätter gridsize baserat på max antal spelare. 4 = 256, 10 = 640, 15 =
+                                              // 960 etc.
         String gameRoomId = UUID.randomUUID().toString();
         gameRoom.setGameRoomId(gameRoomId);
 
