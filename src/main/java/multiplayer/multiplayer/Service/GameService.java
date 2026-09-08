@@ -1,14 +1,11 @@
 package multiplayer.multiplayer.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import multiplayer.multiplayer.dto.CreateGameRoomDTO;

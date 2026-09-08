@@ -5,14 +5,12 @@ import java.util.List;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import multiplayer.multiplayer.Service.GameService;
 import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.dto.GameRoomJoinDTO;
-import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
@@ -23,7 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 
 @RequestMapping("/api")
-@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5174" })
+// @CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5174" })
 public class GameRoomController {
 
     private final GameService gameService;
