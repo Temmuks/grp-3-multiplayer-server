@@ -62,10 +62,9 @@ class GameServiceTest {
             GameService gameService = new GameService();
             GameRoom room = gameService.createGameRoom(new CreateGameRoomDTO("owner-1", 4));
             //Skapande av player + Riktning + Alive (Utgångsvärden)
-            Player player = new Player();
+            Player player = gameService.createPlayer(room.getGameRoomId());
             player.setDirection("right");
             player.setAlive(true);
-            gameService.addNewPlayer(player, room.getGameRoomId());
 
             String playerId = player.getPlayerId();
 
@@ -91,8 +90,7 @@ class GameServiceTest {
           GameService gameService = new GameService();
           GameRoom room = gameService.createGameRoom(new CreateGameRoomDTO("PlayerId", 4));
 
-          Player player = new Player();
-          gameService.addNewPlayer(player, room.getGameRoomId());
+          Player player = gameService.createPlayer(room.getGameRoomId());
 
           String PlayerId = player.getPlayerId();
 
