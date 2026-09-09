@@ -2,7 +2,6 @@ package multiplayer.multiplayer.controller;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +15,11 @@ import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
 import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
+import tools.jackson.databind.util.JSONPObject;
+
 import org.springframework.web.bind.annotation.RequestBody;
+import org.apache.tomcat.util.json.JSONParser;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,14 +56,22 @@ public class GameRoomController {
     // Ansluter till ett gameroom med en ny spelare
     // Spara spelar Id i clienten som "currentPlayer"
     @PostMapping("/join/{gameRoomId}")
-    public ResponseEntity<GameRoomJoinDTO> joinGameRoom(@PathVariable String gameRoomId) {
+
+    public ResponseEntity<GameRoomJoinDTO> joinGameRoom(@PathVariable String gameRoomId, @RequestBody String clientId) {
         Player player = gameService.createPlayer(gameRoomId);
-        if (player == null){
+        boolean isOwner = false;
+        if (player == null) {
             return ResponseEntity.badRequest().build();
+        } else {
+            GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
+                    .toDisplayDTO(gameService.getGameRoomById(gameRoomId));
+            GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO);
+            if (clientId.replaceAll("\"", "").equals(gameService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
+                gameRoomJoinDTO.setOwner(true);
+                System.out.println("Owner was set to true!");
+            }
+            return ResponseEntity.ok(gameRoomJoinDTO);
         }
-        GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper.toDisplayDTO(gameService.getGameRoomById(gameRoomId));
-        GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), gameRoomDisplayDTO);
-        return ResponseEntity.ok(gameRoomJoinDTO);
     }
 
     // Används för postman, kan behövas i framtiden.
