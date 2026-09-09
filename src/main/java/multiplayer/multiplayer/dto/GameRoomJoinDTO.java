@@ -11,6 +11,9 @@ public class GameRoomJoinDTO {
         this.gameRoomDisplayDTO = gameRoomDisplayDTO;
     }
 
+    public GameRoomJoinDTO() {
+    }
+
     public String getPlayerId() {
         return playerId;
     }

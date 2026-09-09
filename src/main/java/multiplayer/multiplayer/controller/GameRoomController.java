@@ -62,14 +62,16 @@ public class GameRoomController {
         boolean isOwner = false;
         if (player == null) {
             return ResponseEntity.badRequest().build();
+        } else {
+            GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
+                    .toDisplayDTO(gameService.getGameRoomById(gameRoomId));
+            GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO);
+            if (clientId.replaceAll("\"", "").equals(gameService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
+                gameRoomJoinDTO.setOwner(true);
+                System.out.println("Owner was set to true!");
+            }
+            return ResponseEntity.ok(gameRoomJoinDTO);
         }
-        GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper.toDisplayDTO(gameService.getGameRoomById(gameRoomId));
-        GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO);
-        if (clientId.replaceAll("\"", "").equals(gameService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
-            gameRoomJoinDTO.setOwner(true);
-            System.out.println("Owner was set to true!");
-        }
-        return ResponseEntity.ok(gameRoomJoinDTO);
     }
 
     // Används för postman, kan behövas i framtiden.
