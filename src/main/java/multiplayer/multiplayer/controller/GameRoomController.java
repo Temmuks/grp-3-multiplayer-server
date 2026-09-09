@@ -67,7 +67,7 @@ public class GameRoomController {
         return gameService.getAllGameRooms();
     }
 
-    @PatchMapping("/start")
+    @PatchMapping("/gameroom/start")
     public GameRoom startGameRoom(@RequestBody SetGameRoomStatusDTO setGameRoomStatusDTO) {
         return gameService.startGameRoom(setGameRoomStatusDTO);
     }
