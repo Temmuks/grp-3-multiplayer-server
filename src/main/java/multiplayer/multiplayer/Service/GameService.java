@@ -249,12 +249,11 @@ public class GameService {
 
     public void distributePlayers(String gameRoomId){
         double degreesOffset = 0;
-        int padding = 3; // Minimum amount of 'pixels' from the wall that a player can spawn at
+        int padding = 10; // Minimum amount of 'pixels' from the wall that a player can spawn at
 
         // Get grid size and how many players there are
         GameRoom gameRoom = getGameRoomById(gameRoomId);
         int gridSize = gameRoom.getGridSize();
-        System.out.println("gridsize: " + gridSize);
         int playerCount = gameRoom.getPlayers().size();
         
         if (playerCount == 0) return; // will cause division by 0 otherwise
@@ -265,17 +264,15 @@ public class GameService {
         // compute radius, given gridSize and padding
         double diameter = gridSize - 2*padding; // remove one padding on each side
         double radius = (double) diameter/2;
-        System.out.println("Diameter: " + diameter);
-        System.out.println("radius: " + radius);
 
-        // Get points on a circle within the grid size (with some padding on the sides), 
-        // and convert them into integer positions x and y
+        // Get center position (roughly)
         PositionDTO center = new PositionDTO(
             (int) (gridSize / 2),
             (int) (gridSize / 2)
         );
-        System.out.println("Center: X:" + center.x() + "Y:" + center.y());
         
+        // Get points on a circle within the grid size (with some padding on the sides), 
+        // and convert them into integer positions x and y
         int currentPlayerIndex = 0;
         for (Player player : gameRoom.getPlayers().values()){
             // generate position
@@ -287,8 +284,6 @@ public class GameService {
             // set players position
             player.setCurrentX(playerPosition.x());
             player.setCurrentY(playerPosition.y());
-            System.out.println(player.getCurrentX());
-            System.out.println(player.getCurrentY());
 
             // increment counter
             currentPlayerIndex++;
