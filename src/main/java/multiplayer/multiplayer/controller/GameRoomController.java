@@ -18,6 +18,7 @@ import tools.jackson.databind.util.JSONPObject;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.apache.tomcat.util.json.JSONParser;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,8 +55,11 @@ public class GameRoomController {
     // Ansluter till ett gameroom med en ny spelare
     // Spara spelar Id i clienten som "currentPlayer"
     @PostMapping("/join/{gameRoomId}")
-    public GameRoomJoinDTO joinGameRoom(@PathVariable String gameRoomId, @RequestBody String clientId) {
-        Player player = new Player();
+    public ResponseEntity<GameRoomJoinDTO> joinGameRoom(@PathVariable String gameRoomId, @RequestBody String clientId) {
+        Player player = gameService.createPlayer(gameRoomId);
+        if (player == null) {
+            return ResponseEntity.badRequest().build();
+        }
         System.out.println(clientId.replaceAll("\"", ""));
         boolean isOwner = false;
         gameService.asignColorToPlayer(player, gameRoomId);
@@ -66,7 +70,7 @@ public class GameRoomController {
             gameRoomJoinDTO.setOwner(true);
             System.out.println("Owner was set to true!");
         }
-        return gameRoomJoinDTO;
+        return ResponseEntity.ok(gameRoomJoinDTO);
     }
 
     // Används för postman, kan behövas i framtiden.
