@@ -12,6 +12,7 @@ import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.PlayerUpdateDTO;
 import multiplayer.multiplayer.dto.PositionDTO;
+import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
 import multiplayer.multiplayer.dto.TurnDTO;
 import multiplayer.multiplayer.enums.GameState;
 import multiplayer.multiplayer.model.GameRoom;
@@ -231,5 +232,13 @@ public class GameService {
         gameRoom.getColors().remove(i);
 
         player.setColor(asignColor);
+    }
+
+    public GameRoom startGameRoom(SetGameRoomStatusDTO setGameRoomStatusDTO) {
+        GameRoom gameRoom = getGameRoomById(setGameRoomStatusDTO.gameRoomId());
+        if (gameRoom.getGameRoomOwner().equals(setGameRoomStatusDTO.clientId())) {
+            gameRoom.setGameRoomStatus(setGameRoomStatusDTO.gameState());
+        }
+        return gameRoom;
     }
 }

@@ -11,11 +11,13 @@ import multiplayer.multiplayer.Service.GameService;
 import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.dto.GameRoomJoinDTO;
+import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
 import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
@@ -65,4 +67,8 @@ public class GameRoomController {
         return gameService.getAllGameRooms();
     }
 
+    @PatchMapping("/gameroom/start")
+    public GameRoom startGameRoom(@RequestBody SetGameRoomStatusDTO setGameRoomStatusDTO) {
+        return gameService.startGameRoom(setGameRoomStatusDTO);
+    }
 }
