@@ -2,6 +2,7 @@ package multiplayer.multiplayer.controller;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,15 +56,13 @@ public class GameRoomController {
     // Ansluter till ett gameroom med en ny spelare
     // Spara spelar Id i clienten som "currentPlayer"
     @PostMapping("/join/{gameRoomId}")
+
     public ResponseEntity<GameRoomJoinDTO> joinGameRoom(@PathVariable String gameRoomId, @RequestBody String clientId) {
         Player player = gameService.createPlayer(gameRoomId);
+        boolean isOwner = false;
         if (player == null) {
             return ResponseEntity.badRequest().build();
         }
-        System.out.println(clientId.replaceAll("\"", ""));
-        boolean isOwner = false;
-        gameService.asignColorToPlayer(player, gameRoomId);
-        gameService.addNewPlayer(player, gameRoomId);
         GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper.toDisplayDTO(gameService.getGameRoomById(gameRoomId));
         GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO);
         if (clientId.replaceAll("\"", "").equals(gameService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
