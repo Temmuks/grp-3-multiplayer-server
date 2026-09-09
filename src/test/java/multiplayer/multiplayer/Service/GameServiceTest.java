@@ -16,7 +16,8 @@ class GameServiceTest {
     void shouldMovePlayerRightWhenAlive() {
         //Arrange
         GameService gameService = new GameService();
-        Player player = new Player();
+        GameRoom room = gameService.createGameRoom(new CreateGameRoomDTO("owner-1", 4));
+        Player player = gameService.createPlayer(room.getGameRoomId());
         player.setCurrentX(10);
         player.setCurrentY(20);
         player.setDirection("right");
@@ -36,7 +37,8 @@ class GameServiceTest {
         // skapa testobjekt och sätt upp startläge
 
         GameService gameService = new GameService();
-        Player player = new Player();
+        GameRoom room = gameService.createGameRoom(new CreateGameRoomDTO("owner-1", 4));
+        Player player = gameService.createPlayer(room.getGameRoomId());
         player.setCurrentX(10);
         player.setCurrentY(20);
         player.setDirection("right");
@@ -62,10 +64,9 @@ class GameServiceTest {
             GameService gameService = new GameService();
             GameRoom room = gameService.createGameRoom(new CreateGameRoomDTO("owner-1", 4));
             //Skapande av player + Riktning + Alive (Utgångsvärden)
-            Player player = new Player();
+            Player player = gameService.createPlayer(room.getGameRoomId());
             player.setDirection("right");
             player.setAlive(true);
-            gameService.addNewPlayer(player, room.getGameRoomId());
 
             String playerId = player.getPlayerId();
 
@@ -91,8 +92,7 @@ class GameServiceTest {
           GameService gameService = new GameService();
           GameRoom room = gameService.createGameRoom(new CreateGameRoomDTO("PlayerId", 4));
 
-          Player player = new Player();
-          gameService.addNewPlayer(player, room.getGameRoomId());
+          Player player = gameService.createPlayer(room.getGameRoomId());
 
           String PlayerId = player.getPlayerId();
 
