@@ -247,9 +247,19 @@ public class GameService {
         player.setColor(asignColor);
     }
 
+    public void distributePlayers(String gameRoomId){
+        // Get grid size and how many players there are
+
+        // Get points on a circle within the grid size (with some padding on the sides), 
+        // and convert them into integer positions x and y
+
+        // Somehow let each player get 1 of the positions each.
+    }
+
     public GameRoom startGameRoom(SetGameRoomStatusDTO setGameRoomStatusDTO) {
         GameRoom gameRoom = getGameRoomById(setGameRoomStatusDTO.gameRoomId());
         if (gameRoom.getGameRoomOwner().equals(setGameRoomStatusDTO.clientId())) {
+            distributePlayers(gameRoom.getGameRoomId());
             gameRoom.setGameRoomStatus(setGameRoomStatusDTO.gameState());
         }
         return gameRoom;
