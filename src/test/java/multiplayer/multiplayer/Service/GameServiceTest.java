@@ -16,7 +16,8 @@ class GameServiceTest {
     void shouldMovePlayerRightWhenAlive() {
         //Arrange
         GameService gameService = new GameService();
-        Player player = new Player();
+        GameRoom room = gameService.createGameRoom(new CreateGameRoomDTO("owner-1", 4));
+        Player player = gameService.createPlayer(room.getGameRoomId());
         player.setCurrentX(10);
         player.setCurrentY(20);
         player.setDirection("right");
@@ -36,7 +37,8 @@ class GameServiceTest {
         // skapa testobjekt och sätt upp startläge
 
         GameService gameService = new GameService();
-        Player player = new Player();
+        GameRoom room = gameService.createGameRoom(new CreateGameRoomDTO("owner-1", 4));
+        Player player = gameService.createPlayer(room.getGameRoomId());
         player.setCurrentX(10);
         player.setCurrentY(20);
         player.setDirection("right");
