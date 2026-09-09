@@ -254,6 +254,7 @@ public class GameService {
         // Get grid size and how many players there are
         GameRoom gameRoom = getGameRoomById(gameRoomId);
         int gridSize = gameRoom.getGridSize();
+        System.out.println("gridsize: " + gridSize);
         int playerCount = gameRoom.getPlayers().size();
         
         if (playerCount == 0) return; // will cause division by 0 otherwise
@@ -264,24 +265,30 @@ public class GameService {
         // compute radius, given gridSize and padding
         double diameter = gridSize - 2*padding; // remove one padding on each side
         double radius = (double) diameter/2;
+        System.out.println("Diameter: " + diameter);
+        System.out.println("radius: " + radius);
 
         // Get points on a circle within the grid size (with some padding on the sides), 
         // and convert them into integer positions x and y
         PositionDTO center = new PositionDTO(
-            (int) gridSize / 2,
-            (int) gridSize / 2
+            (int) (gridSize / 2),
+            (int) (gridSize / 2)
         );
+        System.out.println("Center: X:" + center.x() + "Y:" + center.y());
         
         int currentPlayerIndex = 0;
         for (Player player : gameRoom.getPlayers().values()){
             // generate position
             double positionAngle = currentPlayerIndex*degreesBetweenPlayers + degreesOffset;
             PositionDTO playerPosition = new PositionDTO(
-                (int) (center.x() + Math.cos(Math.toRadians(positionAngle) * radius)),
-                (int) (center.y() + Math.sin(Math.toRadians(positionAngle) * radius))
+                (int) (center.x() + Math.cos(Math.toRadians(positionAngle))* radius),
+                (int) (center.y() + Math.sin(Math.toRadians(positionAngle)) * radius)
             );
             // set players position
-            player.
+            player.setCurrentX(playerPosition.x());
+            player.setCurrentY(playerPosition.y());
+            System.out.println(player.getCurrentX());
+            System.out.println(player.getCurrentY());
 
             // increment counter
             currentPlayerIndex++;
