@@ -210,16 +210,22 @@ public class GameService {
         return gameRoom;
     }
 
-    public void createPlayer(String gameRoomId) {
-        // Kolla om maxgräns redan är uppnådd
+    public Player createPlayer(String gameRoomId) {
+        // Hämta gameroomet
         GameRoom gameRoom = getGameRoomById(gameRoomId);
 
+        // Kolla om maxgräns redan är uppnådd
+        if (gameRoom.getPlayers().size() >= gameRoom.getMaxPlayers()){
+            return null;
+        }
+        
         // skapa spelare
         Player player = new Player();
         asignColorToPlayer(player, gameRoomId);
 
         // lägg till spelaren i gameroomet
         gameRoom.getPlayers().put(player.getPlayerId(), player);
+        return player;
     }
 
     // Hanterar färsättning utav spelare, när en spelare har fått sin färg plockas

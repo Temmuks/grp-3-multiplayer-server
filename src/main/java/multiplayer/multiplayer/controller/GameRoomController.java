@@ -2,6 +2,7 @@ package multiplayer.multiplayer.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,12 +51,14 @@ public class GameRoomController {
     // Ansluter till ett gameroom med en ny spelare
     // Spara spelar Id i clienten som "currentPlayer"
     @PostMapping("/join/{gameRoomId}")
-    public GameRoomJoinDTO joinGameRoom(@PathVariable String gameRoomId) {
-        Player player = new Player();
-        gameService.createPlayer(gameRoomId);
+    public ResponseEntity<GameRoomJoinDTO> joinGameRoom(@PathVariable String gameRoomId) {
+        Player player = gameService.createPlayer(gameRoomId);
+        if (player == null){
+            return ResponseEntity.badRequest().build();
+        }
         GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper.toDisplayDTO(gameService.getGameRoomById(gameRoomId));
         GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), gameRoomDisplayDTO);
-        return gameRoomJoinDTO;
+        return ResponseEntity.ok(gameRoomJoinDTO);
     }
 
     // Används för postman, kan behövas i framtiden.
