@@ -52,8 +52,7 @@ public class GameRoomController {
     @PostMapping("/join/{gameRoomId}")
     public GameRoomJoinDTO joinGameRoom(@PathVariable String gameRoomId) {
         Player player = new Player();
-        gameService.asignColorToPlayer(player, gameRoomId);
-        gameService.addNewPlayer(player, gameRoomId);
+        gameService.createPlayer(gameRoomId);
         GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper.toDisplayDTO(gameService.getGameRoomById(gameRoomId));
         GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), gameRoomDisplayDTO);
         return gameRoomJoinDTO;

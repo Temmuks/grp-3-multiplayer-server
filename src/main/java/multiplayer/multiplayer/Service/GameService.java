@@ -210,8 +210,15 @@ public class GameService {
         return gameRoom;
     }
 
-    public void addNewPlayer(Player player, String gameRoomId) {
+    public void createPlayer(String gameRoomId) {
+        // Kolla om maxgräns redan är uppnådd
         GameRoom gameRoom = getGameRoomById(gameRoomId);
+
+        // skapa spelare
+        Player player = new Player();
+        asignColorToPlayer(player, gameRoomId);
+
+        // lägg till spelaren i gameroomet
         gameRoom.getPlayers().put(player.getPlayerId(), player);
     }
 
