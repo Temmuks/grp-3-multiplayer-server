@@ -7,6 +7,7 @@ import multiplayer.multiplayer.Service.GameService;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.TurnDTO;
+import multiplayer.multiplayer.enums.GameState;
 import multiplayer.multiplayer.model.GameRoom;
 
 import java.util.List;
@@ -30,8 +31,10 @@ public class GameController {
     public void gameTick() {
 
         gameService.getAllGameRooms().forEach(gameRoom -> {
-            GameRoomUpdateDTO gameRoomUpdateDTO = gameService.tick(gameRoom.getGameRoomId());
-            messagingTemplate.convertAndSend("/topic/game/" + gameRoom.getGameRoomId(), gameRoomUpdateDTO);
+            if (gameRoom.getGameRoomStatus().equals(GameState.IN_PROGRESS)) {
+                GameRoomUpdateDTO gameRoomUpdateDTO = gameService.tick(gameRoom.getGameRoomId());
+                messagingTemplate.convertAndSend("/topic/game/" + gameRoom.getGameRoomId(), gameRoomUpdateDTO);
+            }
             // System.out.println(gameRoomUpdateDTO);
         });
 

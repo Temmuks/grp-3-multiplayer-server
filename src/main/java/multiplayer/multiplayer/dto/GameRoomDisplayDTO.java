@@ -8,7 +8,6 @@ public record GameRoomDisplayDTO(
         int maxPlayers,
         int gridSize,
         GameState gameRoomStatus,
-    String gameRoomOwner,
-    String winner,
-    String winnerColor) {
+        String winner,
+        String winnerColor) {
 }

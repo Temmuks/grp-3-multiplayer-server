@@ -12,6 +12,7 @@ import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.PlayerUpdateDTO;
 import multiplayer.multiplayer.dto.PositionDTO;
+import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
 import multiplayer.multiplayer.dto.TurnDTO;
 import multiplayer.multiplayer.enums.GameState;
 import multiplayer.multiplayer.model.GameRoom;
@@ -210,9 +211,26 @@ public class GameService {
         return gameRoom;
     }
 
-    public void addNewPlayer(Player player, String gameRoomId) {
+    public void deleteAllGameRooms(){
+        gameRoomList = new ArrayList<>();
+    }
+
+    public Player createPlayer(String gameRoomId) {
+        // Hämta gameroomet
         GameRoom gameRoom = getGameRoomById(gameRoomId);
+
+        // Kolla om maxgräns redan är uppnådd
+        if (gameRoom.getPlayers().size() >= gameRoom.getMaxPlayers()){
+            return null;
+        }
+        
+        // skapa spelare
+        Player player = new Player();
+        asignColorToPlayer(player, gameRoomId);
+
+        // lägg till spelaren i gameroomet
         gameRoom.getPlayers().put(player.getPlayerId(), player);
+        return player;
     }
 
     // Hanterar färsättning utav spelare, när en spelare har fått sin färg plockas
@@ -231,5 +249,57 @@ public class GameService {
         gameRoom.getColors().remove(i);
 
         player.setColor(asignColor);
+    }
+
+    public void distributePlayers(String gameRoomId){
+        double degreesOffset = 0;
+        int padding = 10; // Minimum amount of 'pixels' from the wall that a player can spawn at
+
+        // Get grid size and how many players there are
+        GameRoom gameRoom = getGameRoomById(gameRoomId);
+        int gridSize = gameRoom.getGridSize();
+        int playerCount = gameRoom.getPlayers().size();
+        
+        if (playerCount == 0) return; // will cause division by 0 otherwise
+
+        // Get degrees between each player
+        double degreesBetweenPlayers = 360.0/playerCount;
+
+        // compute radius, given gridSize and padding
+        double diameter = gridSize - 2*padding; // remove one padding on each side
+        double radius = (double) diameter/2;
+
+        // Get center position (roughly)
+        PositionDTO center = new PositionDTO(
+            (int) (gridSize / 2),
+            (int) (gridSize / 2)
+        );
+        
+        // Get points on a circle within the grid size (with some padding on the sides), 
+        // and convert them into integer positions x and y
+        int currentPlayerIndex = 0;
+        for (Player player : gameRoom.getPlayers().values()){
+            // generate position
+            double positionAngle = currentPlayerIndex*degreesBetweenPlayers + degreesOffset;
+            PositionDTO playerPosition = new PositionDTO(
+                (int) (center.x() + Math.cos(Math.toRadians(positionAngle))* radius),
+                (int) (center.y() + Math.sin(Math.toRadians(positionAngle)) * radius)
+            );
+            // set players position
+            player.setCurrentX(playerPosition.x());
+            player.setCurrentY(playerPosition.y());
+
+            // increment counter
+            currentPlayerIndex++;
+        }
+    }
+
+    public GameRoom startGameRoom(SetGameRoomStatusDTO setGameRoomStatusDTO) {
+        GameRoom gameRoom = getGameRoomById(setGameRoomStatusDTO.gameRoomId());
+        if (gameRoom.getGameRoomOwner().equals(setGameRoomStatusDTO.clientId())) {
+            distributePlayers(gameRoom.getGameRoomId());
+            gameRoom.setGameRoomStatus(setGameRoomStatusDTO.gameState());
+        }
+        return gameRoom;
     }
 }

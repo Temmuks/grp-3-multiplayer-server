@@ -1,4 +1,5 @@
 package multiplayer.multiplayer.mapper;
+
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
@@ -22,7 +23,6 @@ public class GameRoomMapper {
                 gameRoom.getMaxPlayers(),
                 gameRoom.getGridSize(),
                 gameRoom.getGameRoomStatus(),
-                gameRoom.getGameRoomOwner(),
                 winner,
                 winnerColor);
 
