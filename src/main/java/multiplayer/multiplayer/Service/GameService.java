@@ -149,7 +149,6 @@ public class GameService {
             // player.getColor());
         }
 
-        gameRoom.getPreviousPositions().putAll(newOccupiedPositions);
         // Check collisions
         for (Player player : gameRoom.getPlayers().values()){
             if (!player.isAlive()) continue;
@@ -157,14 +156,8 @@ public class GameService {
             player.setAlive(!hasPlayerCollided(player, gameRoom)); // if has collided, set player as dead
         }
         
-        // Add all new player's positions in the previousPositions
-        for (Player player : gameRoom.getPlayers().values()){
-            gameRoom.getPreviousPositions().put(
-                new PositionDTO(player.getCurrentX(), player.getCurrentY()),
-                player.getPlayerId()
-            );
-        }
-
+        // Add their previous positions to the gamerooms list
+        gameRoom.getPreviousPositions().putAll(newOccupiedPositions);
 
         // Kolla om någon vinnare finns
         if (checkWinner(gameRoom) != null) {
