@@ -101,13 +101,13 @@ public class GameService {
     }
 
     // Turn a PositionChangeDTO into a list of PositionDTO of all possible positions between start and end, inclusive.
-    private List<PositionDTO> toPositionDTOList(PositionChangeDTO positionChangeDTO){
+    private List<PositionDTO> toPositionDTOList(PositionDTO pos1, PositionDTO pos2){
         List<PositionDTO> positionDTOs = new ArrayList<>();
-        int minX = Math.min(positionChangeDTO.pos1().x(), positionChangeDTO.pos2().x());
-        int maxX = Math.max(positionChangeDTO.pos1().x(), positionChangeDTO.pos2().x());
+        int minX = Math.min(pos1.x(), pos2.x());
+        int maxX = Math.max(pos1.x(), pos2.x());
 
-        int minY = Math.min(positionChangeDTO.pos1().y(), positionChangeDTO.pos2().y());
-        int maxY = Math.max(positionChangeDTO.pos1().y(), positionChangeDTO.pos2().y());
+        int minY = Math.min(pos1.y(), pos2.y());
+        int maxY = Math.max(pos1.y(), pos2.y());
         for(int x = minX; x <= maxX; x++){
             for(int y = minY; y <= maxY; y++){
                 positionDTOs.add(new PositionDTO(x, y));
@@ -134,11 +134,11 @@ public class GameService {
             applyMovement(player);
             PositionDTO positionAfter = new PositionDTO(player.getCurrentX(), player.getCurrentY());
             
-            PositionChangeDTO positionChangeDTO = new PositionChangeDTO(positionBefore, positionAfter);
-            toPositionDTOList(positionChangeDTO).forEach(pcDTO -> {
+            List<PositionDTO> playerPositions = toPositionDTOList(positionBefore, positionAfter);
+            playerPositions.forEach(pcDTO -> {
                 newOccupiedPositions.put(pcDTO, player.getPlayerId());
             });
-            PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getPlayerId(), player.getColor(), positionChangeDTO);
+            PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getPlayerId(), player.getColor(), playerPositions);
 
             gameRoomUpdateDTO.getPlayerUpdateDTOList().add(playerUpdateDTO);
 
