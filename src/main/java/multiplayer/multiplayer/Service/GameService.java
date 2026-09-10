@@ -1,6 +1,7 @@
 package multiplayer.multiplayer.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -123,6 +124,9 @@ public class GameService {
         GameRoom gameRoom = getGameRoomById(gameRoomId);
 
         gameRoomUpdateDTO.setGameRoomStatus(gameRoom.getGameRoomStatus());
+
+        // Make a list of occupiedPositions. We will fill this map for each player first, then add it to the gameRooms's previousPositions map.
+        Map<PositionDTO, String> newOccupiedPositions = new HashMap<>();
         // Applicera alla spelares nya positioner (inkl kolla kollisioner)
         for (Player player : gameRoom.getPlayers().values()) {
             // Move player
@@ -130,8 +134,10 @@ public class GameService {
             applyMovement(player);
             PositionDTO positionAfter = new PositionDTO(player.getCurrentX(), player.getCurrentY());
             
-
             PositionChangeDTO positionChangeDTO = new PositionChangeDTO(positionBefore, positionAfter);
+            toPositionDTOList(positionChangeDTO).forEach(pcDTO -> {
+                newOccupiedPositions.put(pcDTO, player.getPlayerId());
+            });
             PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getPlayerId(), player.getColor(), positionChangeDTO);
 
             gameRoomUpdateDTO.getPlayerUpdateDTOList().add(playerUpdateDTO);
@@ -143,6 +149,7 @@ public class GameService {
             // player.getColor());
         }
 
+        gameRoom.getPreviousPositions().putAll(newOccupiedPositions);
         // Kolla om någon vinnare finns
         if (checkWinner(gameRoom) != null) {
             gameRoomUpdateDTO.setGameRoomStatus(GameState.FINISHED);
