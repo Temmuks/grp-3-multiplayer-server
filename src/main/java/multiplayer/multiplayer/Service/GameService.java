@@ -109,19 +109,9 @@ public class GameService {
         gameRoomUpdateDTO.setGameRoomStatus(gameRoom.getGameRoomStatus());
         // Applicera alla spelares nya positioner (inkl kolla kollisioner)
         for (Player player : gameRoom.getPlayers().values()) {
-            // Check if player has dashTicksLeft > 0
-            // If the player is dashing, move every tick. Otherwise (not dashing), move every other tick.
-            if (player.getCurrentDashTicksLeft() > 0){
+            // Move player
+            applyMovement(player);
 
-                applyMovement(player);
-                
-                // decrement dashTicksLeft
-                player.setCurrentDashTicksLeft(player.getCurrentDashTicksLeft()-1);
-            } else {
-                if (gameRoom.getTick() % 2 == 0){
-                    applyMovement(player);
-                }
-            }
 
             PositionDTO positionDTO = new PositionDTO(player.getCurrentX(), player.getCurrentY());
 
