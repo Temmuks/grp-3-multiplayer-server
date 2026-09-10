@@ -211,6 +211,10 @@ public class GameService {
         return gameRoom;
     }
 
+    public void deleteAllGameRooms(){
+        gameRoomList = new ArrayList<>();
+    }
+
     public Player createPlayer(String gameRoomId) {
         // Hämta gameroomet
         GameRoom gameRoom = getGameRoomById(gameRoomId);
