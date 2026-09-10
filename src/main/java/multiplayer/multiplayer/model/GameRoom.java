@@ -9,6 +9,7 @@ import multiplayer.multiplayer.dto.PositionDTO;
 import multiplayer.multiplayer.enums.GameState;
 
 public class GameRoom {
+    Long tick = 0L;
 
     List<String> colors = new ArrayList<>(List.of("crimson",
             "royalblue",
@@ -125,6 +126,14 @@ public class GameRoom {
 
     public void setColors(List<String> colors) {
         this.colors = colors;
+    }
+
+    public Long getTick() {
+        return tick;
+    }
+
+    public void setTick(Long tick) {
+        this.tick = tick;
     }
 
     // TBD

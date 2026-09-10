@@ -27,7 +27,7 @@ public class GameController {
     }
 
     // Gameloop som med en satt intervall updaterar klienten med nya positioner
-    @Scheduled(fixedRate = 60)
+    @Scheduled(fixedRate = 30)
     public void gameTick() {
 
         gameService.getAllGameRooms().forEach(gameRoom -> {
