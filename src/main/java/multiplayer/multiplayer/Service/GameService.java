@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import multiplayer.multiplayer.dto.CreateGameRoomDTO;
+import multiplayer.multiplayer.dto.DashDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.PlayerUpdateDTO;
 import multiplayer.multiplayer.dto.PositionDTO;
@@ -176,6 +177,17 @@ public class GameService {
             return winner;
         }
         return null;
+    }
+
+    public void activateDash(DashDTO dashDTO){
+        Player player = getPlayerById(dashDTO.playerId(), dashDTO.gameRoomId());
+        int ticksOfDash = 100; // adjust this later. 
+        if (player.getDashesLeft() <= 0) return; // No more dashes left
+        
+        player.setCurrentDashTicksLeft(player.getCurrentDashTicksLeft() + ticksOfDash);
+        
+        // decrement dashes left
+        player.setDashesLeft(player.getDashesLeft()-1);
     }
 
     // Detta är lite till för att frontend bara behöver veta färgen på vinnaren typ
