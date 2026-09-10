@@ -108,6 +108,7 @@ public class GameService {
         gameRoomUpdateDTO.setGameRoomStatus(gameRoom.getGameRoomStatus());
         // Applicera alla spelares nya positioner (inkl kolla kollisioner)
         for (Player player : gameRoom.getPlayers().values()) {
+            // Move players
             applyMovement(player);
 
             PositionDTO positionDTO = new PositionDTO(player.getCurrentX(), player.getCurrentY());
@@ -122,6 +123,22 @@ public class GameService {
             // gameRoomUpdateDTO.getPlayerColors().put(player.getPlayerId(),
             // player.getColor());
         }
+
+        // Check collisions
+        for (Player player : gameRoom.getPlayers().values()){
+            if (!player.isAlive()) continue;
+            
+            player.setAlive(!hasPlayerCollided(player, gameRoom)); // if has collided, set player as dead
+        }
+        
+        // Add all new player's positions in the previousPositions
+        for (Player player : gameRoom.getPlayers().values()){
+            gameRoom.getPreviousPositions().put(
+                new PositionDTO(player.getCurrentX(), player.getCurrentY()),
+                player.getPlayerId()
+            );
+        }
+
 
         // Kolla om någon vinnare finns
         if (checkWinner(gameRoom) != null) {
