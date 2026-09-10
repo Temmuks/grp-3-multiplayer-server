@@ -12,6 +12,7 @@ import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.DashDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.PlayerUpdateDTO;
+import multiplayer.multiplayer.dto.PositionChangeDTO;
 import multiplayer.multiplayer.dto.PositionDTO;
 import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
 import multiplayer.multiplayer.dto.TurnDTO;
@@ -57,32 +58,31 @@ public class GameService {
     }
 
     public boolean applyMovement(Player player) {
+        int movementAmount = 1;
 
         // Lever spelaren?
         if (!player.isAlive()) {
             return false;
         }
-
-        // Har spelaren kolliderat?
-        // if(hasPlayerColided(player, gameRoom)){
-        // player.setAlive(false);
-        // // När en spelare dör kan winner-läget ändras.
-        // //ska fungera när vi löser kollisionslogiken.
-        // }
+        // Move 2 units if the player has dashTicks left
+        if (player.getCurrentDashTicksLeft() > 0) {
+            player.setCurrentDashTicksLeft(player.getCurrentDashTicksLeft()-1);
+            movementAmount = 2;
+        }
 
         // Flytta spelaren
         switch (player.getDirection()) {
             case "up":
-                player.setCurrentY(player.getCurrentY() - 1);
+                player.setCurrentY(player.getCurrentY() - movementAmount);
                 break;
             case "down":
-                player.setCurrentY(player.getCurrentY() + 1);
+                player.setCurrentY(player.getCurrentY() + movementAmount);
                 break;
             case "left":
-                player.setCurrentX(player.getCurrentX() - 1);
+                player.setCurrentX(player.getCurrentX() - movementAmount);
                 break;
             case "right":
-                player.setCurrentX(player.getCurrentX() + 1);
+                player.setCurrentX(player.getCurrentX() + movementAmount);
                 break;
 
             default:
@@ -99,6 +99,22 @@ public class GameService {
         return true;
     }
 
+    // Turn a PositionChangeDTO into a list of PositionDTO of all possible positions between start and end, inclusive.
+    private List<PositionDTO> toPositionDTOList(PositionChangeDTO positionChangeDTO){
+        List<PositionDTO> positionDTOs = new ArrayList<>();
+        int minX = Math.min(positionChangeDTO.pos1().x(), positionChangeDTO.pos2().x());
+        int maxX = Math.max(positionChangeDTO.pos1().x(), positionChangeDTO.pos2().x());
+
+        int minY = Math.min(positionChangeDTO.pos1().y(), positionChangeDTO.pos2().y());
+        int maxY = Math.max(positionChangeDTO.pos1().y(), positionChangeDTO.pos2().y());
+        for(int x = minX; x <= maxX; x++){
+            for(int y = minY; y <= maxY; y++){
+                positionDTOs.add(new PositionDTO(x, y));
+            }
+        }
+        return positionDTOs;
+    }
+
     public GameRoomUpdateDTO tick(String gameRoomId) {
         // kolla att rummet är IN_PROGRESS
         GameRoomUpdateDTO gameRoomUpdateDTO = new GameRoomUpdateDTO();
@@ -110,12 +126,13 @@ public class GameService {
         // Applicera alla spelares nya positioner (inkl kolla kollisioner)
         for (Player player : gameRoom.getPlayers().values()) {
             // Move player
+            PositionDTO positionBefore = new PositionDTO(player.getCurrentX(), player.getCurrentY());
             applyMovement(player);
+            PositionDTO positionAfter = new PositionDTO(player.getCurrentX(), player.getCurrentY());
+            
 
-
-            PositionDTO positionDTO = new PositionDTO(player.getCurrentX(), player.getCurrentY());
-
-            PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getPlayerId(), player.getColor(), positionDTO);
+            PositionChangeDTO positionChangeDTO = new PositionChangeDTO(positionBefore, positionAfter);
+            PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getPlayerId(), player.getColor(), positionChangeDTO);
 
             gameRoomUpdateDTO.getPlayerUpdateDTOList().add(playerUpdateDTO);
 
@@ -171,7 +188,7 @@ public class GameService {
 
     public void activateDash(DashDTO dashDTO){
         Player player = getPlayerById(dashDTO.playerId(), dashDTO.gameRoomId());
-        int ticksOfDash = 100; // adjust this later. 
+        int ticksOfDash = 50; // adjust this later. 
         if (player.getDashesLeft() <= 0) return; // No more dashes left
         
         player.setCurrentDashTicksLeft(player.getCurrentDashTicksLeft() + ticksOfDash);
