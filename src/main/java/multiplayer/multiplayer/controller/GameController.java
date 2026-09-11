@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 
 import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.Service.GameService;
+import multiplayer.multiplayer.dto.DashDTO;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.TurnDTO;
@@ -59,6 +60,11 @@ public class GameController {
     @MessageMapping("/turn")
     public void turn(TurnDTO turnDTO) {
         gameService.updatePlayerDirection(turnDTO);
+    }
+
+    @MessageMapping("/dash")
+    public void dash(DashDTO dashDTO){
+        gameService.activateDash(dashDTO);
     }
 
 }
