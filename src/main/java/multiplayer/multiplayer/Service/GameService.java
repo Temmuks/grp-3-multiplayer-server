@@ -108,6 +108,7 @@ public class GameService {
         gameRoomUpdateDTO.setGameRoomStatus(gameRoom.getGameRoomStatus());
         // Applicera alla spelares nya positioner (inkl kolla kollisioner)
         for (Player player : gameRoom.getPlayers().values()) {
+            // Move players
             applyMovement(player);
 
             PositionDTO positionDTO = new PositionDTO(player.getCurrentX(), player.getCurrentY());
@@ -123,6 +124,22 @@ public class GameService {
             // player.getColor());
         }
 
+        // Check collisions
+        for (Player player : gameRoom.getPlayers().values()){
+            if (!player.isAlive()) continue;
+            
+            player.setAlive(!hasPlayerCollided(player, gameRoom)); // if has collided, set player as dead
+        }
+        
+        // Add all new player's positions in the previousPositions
+        for (Player player : gameRoom.getPlayers().values()){
+            gameRoom.getPreviousPositions().put(
+                new PositionDTO(player.getCurrentX(), player.getCurrentY()),
+                player.getPlayerId()
+            );
+        }
+
+
         // Kolla om någon vinnare finns
         if (checkWinner(gameRoom) != null) {
             gameRoomUpdateDTO.setGameRoomStatus(GameState.FINISHED);
@@ -133,10 +150,20 @@ public class GameService {
         // Returnera map med alla spelare i gameroomets positioner
     }
 
-    private boolean hasPlayerColided(Player player, GameRoom gameRoom) {
+    private boolean hasPlayerCollided(Player player, GameRoom gameRoom) {
         // kolla om spelare har krockat igenom att kolla spelarens position är och
         // jämför med befintliga positioner i gameRoomets lista
-        return false; // temporär return för att kunna sätta igång servern
+        
+        // Skapa DTO att jämföra med
+        PositionDTO playerPosition = new PositionDTO(player.getCurrentX(), player.getCurrentY());
+
+        boolean hasCollidedWithOtherPlayer = gameRoom.getPreviousPositions().containsKey(playerPosition);
+        boolean hasCollidedWithWall = (playerPosition.x() < 0  // left wall
+                                    || playerPosition.x() >= gameRoom.getGridSize()  // right wall
+                                    || playerPosition.y() < 0  // upper wall
+                                    || playerPosition.y() >= gameRoom.getGridSize()); // lower wall
+        
+        return hasCollidedWithOtherPlayer || hasCollidedWithWall;
     }
 
     public Player checkWinner(GameRoom gameRoom) {
@@ -201,7 +228,7 @@ public class GameService {
         gameRoom.setGameRoomStatus(GameState.NOT_STARTED);
         gameRoom.setMaxPlayers(createGameRoomDTO.getMaxPlayers());
         gameRoom.setGameRoomOwner(createGameRoomDTO.getClientId());
-        gameRoom.setGridSize(createGameRoomDTO.getMaxPlayers() * 64);// Sätter gridsize baserat på max antal spelare. 4
+        gameRoom.setGridSize(4 * 64);// Sätter gridsize baserat på max antal spelare. 4
                                                                      // = 256, 10 = 640, 15 =
         // 960 etc.
         String gameRoomId = UUID.randomUUID().toString();
@@ -253,7 +280,7 @@ public class GameService {
 
     public void distributePlayers(String gameRoomId){
         double degreesOffset = 0;
-        int padding = 10; // Minimum amount of 'pixels' from the wall that a player can spawn at
+        int padding = 30; // Minimum amount of 'pixels' from the wall that a player can spawn at
 
         // Get grid size and how many players there are
         GameRoom gameRoom = getGameRoomById(gameRoomId);
