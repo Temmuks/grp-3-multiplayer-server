@@ -32,8 +32,12 @@ public class GameController {
     public void gameTick() {
 
         gameService.getAllGameRooms().forEach(gameRoom -> {
-            if (gameRoom.getGameRoomStatus().equals(GameState.IN_PROGRESS)) {
+            if (!gameRoom.getGameRoomStatus().equals(GameState.NOT_STARTED)) {
                 GameRoomUpdateDTO gameRoomUpdateDTO = gameService.tick(gameRoom.getGameRoomId());
+                if (gameRoom.getGameRoomStatus().equals(GameState.FINISHED)) {
+                    gameRoomUpdateDTO.setWinnerColor(gameService.getWinnerColor(gameRoom));
+                    gameService.deleteGameRoomById(gameRoom.getGameRoomId());
+                }
                 messagingTemplate.convertAndSend("/topic/game/" + gameRoom.getGameRoomId(), gameRoomUpdateDTO);
             }
             // System.out.println(gameRoomUpdateDTO);
@@ -63,7 +67,7 @@ public class GameController {
     }
 
     @MessageMapping("/dash")
-    public void dash(DashDTO dashDTO){
+    public void dash(DashDTO dashDTO) {
         gameService.activateDash(dashDTO);
     }
 

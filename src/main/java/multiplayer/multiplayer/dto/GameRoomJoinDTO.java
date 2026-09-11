@@ -4,11 +4,14 @@ public class GameRoomJoinDTO {
     String playerId;
     boolean isOwner;
     GameRoomDisplayDTO gameRoomDisplayDTO;
+    String playerColor;
 
-    public GameRoomJoinDTO(String playerId, boolean isOwner, GameRoomDisplayDTO gameRoomDisplayDTO) {
+    public GameRoomJoinDTO(String playerId, boolean isOwner, GameRoomDisplayDTO gameRoomDisplayDTO,
+            String playerColor) {
         this.playerId = playerId;
         this.isOwner = isOwner;
         this.gameRoomDisplayDTO = gameRoomDisplayDTO;
+        this.playerColor = playerColor;
     }
 
     public GameRoomJoinDTO() {
@@ -36,6 +39,14 @@ public class GameRoomJoinDTO {
 
     public void setOwner(boolean isOwner) {
         this.isOwner = isOwner;
+    }
+
+    public String getPlayerColor() {
+        return playerColor;
+    }
+
+    public void setPlayerColor(String playerColor) {
+        this.playerColor = playerColor;
     }
 
 }
