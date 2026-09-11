@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 @RestController
 
 @RequestMapping("/api")
@@ -68,7 +67,8 @@ public class GameRoomController {
         } else {
             GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
                     .toDisplayDTO(gameService.getGameRoomById(gameRoomId));
-            GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO);
+            GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO,
+                    player.getColor());
             if (clientId.replaceAll("\"", "").equals(gameService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
                 gameRoomJoinDTO.setOwner(true);
                 System.out.println("Owner was set to true!");
@@ -93,5 +93,5 @@ public class GameRoomController {
         gameService.deleteAllGameRooms();
         return ResponseEntity.ok().build();
     }
-    
+
 }

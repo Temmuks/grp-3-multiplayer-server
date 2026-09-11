@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 
 import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.Service.GameService;
+import multiplayer.multiplayer.dto.DashDTO;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.TurnDTO;
@@ -31,8 +32,12 @@ public class GameController {
     public void gameTick() {
 
         gameService.getAllGameRooms().forEach(gameRoom -> {
-            if (gameRoom.getGameRoomStatus().equals(GameState.IN_PROGRESS)) {
+            if (!gameRoom.getGameRoomStatus().equals(GameState.NOT_STARTED)) {
                 GameRoomUpdateDTO gameRoomUpdateDTO = gameService.tick(gameRoom.getGameRoomId());
+                if (gameRoom.getGameRoomStatus().equals(GameState.FINISHED)) {
+                    gameRoomUpdateDTO.setWinnerColor(gameService.getWinnerColor(gameRoom));
+                    gameService.deleteGameRoomById(gameRoom.getGameRoomId());
+                }
                 messagingTemplate.convertAndSend("/topic/game/" + gameRoom.getGameRoomId(), gameRoomUpdateDTO);
             }
             // System.out.println(gameRoomUpdateDTO);
@@ -59,6 +64,11 @@ public class GameController {
     @MessageMapping("/turn")
     public void turn(TurnDTO turnDTO) {
         gameService.updatePlayerDirection(turnDTO);
+    }
+
+    @MessageMapping("/dash")
+    public void dash(DashDTO dashDTO) {
+        gameService.activateDash(dashDTO);
     }
 
 }

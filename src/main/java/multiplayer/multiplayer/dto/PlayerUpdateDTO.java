@@ -1,6 +1,8 @@
 package multiplayer.multiplayer.dto;
 
+import java.util.List;
+
 public record PlayerUpdateDTO(String playerId,
         String playerColor,
-        PositionDTO positionDTO) {
+        List<PositionDTO> positions) {
 }

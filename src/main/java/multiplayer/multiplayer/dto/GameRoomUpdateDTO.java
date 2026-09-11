@@ -6,11 +6,11 @@ import java.util.List;
 import multiplayer.multiplayer.enums.GameState;
 
 public class GameRoomUpdateDTO {
+    String winnerColor;
     GameState gameRoomStatus;
     List<PlayerUpdateDTO> playerUpdateDTOList = new ArrayList<>();
 
     public GameRoomUpdateDTO() {
-        gameRoomStatus = GameState.NOT_STARTED;
     }
 
     public GameState getGameRoomStatus() {
@@ -27,6 +27,14 @@ public class GameRoomUpdateDTO {
 
     public void setPlayerUpdateDTOList(List<PlayerUpdateDTO> playerUpdateDTOList) {
         this.playerUpdateDTOList = playerUpdateDTOList;
+    }
+
+    public String getWinnerColor() {
+        return winnerColor;
+    }
+
+    public void setWinnerColor(String winnerColor) {
+        this.winnerColor = winnerColor;
     }
 
 }

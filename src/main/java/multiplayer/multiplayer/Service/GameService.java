@@ -1,6 +1,7 @@
 package multiplayer.multiplayer.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -9,8 +10,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import multiplayer.multiplayer.dto.CreateGameRoomDTO;
+import multiplayer.multiplayer.dto.DashDTO;
 import multiplayer.multiplayer.dto.GameRoomUpdateDTO;
 import multiplayer.multiplayer.dto.PlayerUpdateDTO;
+import multiplayer.multiplayer.dto.PositionChangeDTO;
 import multiplayer.multiplayer.dto.PositionDTO;
 import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
 import multiplayer.multiplayer.dto.TurnDTO;
@@ -56,32 +59,31 @@ public class GameService {
     }
 
     public boolean applyMovement(Player player) {
+        int movementAmount = 1;
 
         // Lever spelaren?
         if (!player.isAlive()) {
             return false;
         }
-
-        // Har spelaren kolliderat?
-        // if(hasPlayerColided(player, gameRoom)){
-        // player.setAlive(false);
-        // // När en spelare dör kan winner-läget ändras.
-        // //ska fungera när vi löser kollisionslogiken.
-        // }
+        // Move 2 units if the player has dashTicks left
+        if (player.getCurrentDashTicksLeft() > 0) {
+            player.setCurrentDashTicksLeft(player.getCurrentDashTicksLeft() - 1);
+            movementAmount = 2;
+        }
 
         // Flytta spelaren
         switch (player.getDirection()) {
             case "up":
-                player.setCurrentY(player.getCurrentY() - 1);
+                player.setCurrentY(player.getCurrentY() - movementAmount);
                 break;
             case "down":
-                player.setCurrentY(player.getCurrentY() + 1);
+                player.setCurrentY(player.getCurrentY() + movementAmount);
                 break;
             case "left":
-                player.setCurrentX(player.getCurrentX() - 1);
+                player.setCurrentX(player.getCurrentX() - movementAmount);
                 break;
             case "right":
-                player.setCurrentX(player.getCurrentX() + 1);
+                player.setCurrentX(player.getCurrentX() + movementAmount);
                 break;
 
             default:
@@ -98,6 +100,23 @@ public class GameService {
         return true;
     }
 
+    // Turn a PositionChangeDTO into a list of PositionDTO of all possible positions
+    // between start and end, inclusive.
+    private List<PositionDTO> toPositionDTOList(PositionDTO pos1, PositionDTO pos2) {
+        List<PositionDTO> positionDTOs = new ArrayList<>();
+        int minX = Math.min(pos1.x(), pos2.x());
+        int maxX = Math.max(pos1.x(), pos2.x());
+
+        int minY = Math.min(pos1.y(), pos2.y());
+        int maxY = Math.max(pos1.y(), pos2.y());
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                positionDTOs.add(new PositionDTO(x, y));
+            }
+        }
+        return positionDTOs;
+    }
+
     public GameRoomUpdateDTO tick(String gameRoomId) {
         // kolla att rummet är IN_PROGRESS
         GameRoomUpdateDTO gameRoomUpdateDTO = new GameRoomUpdateDTO();
@@ -106,13 +125,23 @@ public class GameService {
         GameRoom gameRoom = getGameRoomById(gameRoomId);
 
         gameRoomUpdateDTO.setGameRoomStatus(gameRoom.getGameRoomStatus());
+
+        // Make a list of occupiedPositions. We will fill this map for each player
+        // first, then add it to the gameRooms's previousPositions map.
+        Map<PositionDTO, String> newOccupiedPositions = new HashMap<>();
         // Applicera alla spelares nya positioner (inkl kolla kollisioner)
         for (Player player : gameRoom.getPlayers().values()) {
+            // Move player
+            PositionDTO positionBefore = new PositionDTO(player.getCurrentX(), player.getCurrentY());
             applyMovement(player);
+            PositionDTO positionAfter = new PositionDTO(player.getCurrentX(), player.getCurrentY());
 
-            PositionDTO positionDTO = new PositionDTO(player.getCurrentX(), player.getCurrentY());
-
-            PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getPlayerId(), player.getColor(), positionDTO);
+            List<PositionDTO> playerPositions = toPositionDTOList(positionBefore, positionAfter);
+            playerPositions.forEach(pcDTO -> {
+                newOccupiedPositions.put(pcDTO, player.getPlayerId());
+            });
+            PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getPlayerId(), player.getColor(),
+                    playerPositions);
 
             gameRoomUpdateDTO.getPlayerUpdateDTOList().add(playerUpdateDTO);
 
@@ -123,20 +152,44 @@ public class GameService {
             // player.getColor());
         }
 
+        // Check collisions
+        for (Player player : gameRoom.getPlayers().values()) {
+            if (!player.isAlive())
+                continue;
+
+            player.setAlive(!hasPlayerCollided(player, gameRoom)); // if has collided, set player as dead
+        }
+
+        // Add their previous positions to the gamerooms list
+        gameRoom.getPreviousPositions().putAll(newOccupiedPositions);
+
         // Kolla om någon vinnare finns
         if (checkWinner(gameRoom) != null) {
             gameRoomUpdateDTO.setGameRoomStatus(GameState.FINISHED);
             // gameRoomUpdateDTO.setWinner(blabla)
         }
 
+        // increment tick count
+        gameRoom.setTick(gameRoom.getTick() + 1);
+
         return gameRoomUpdateDTO;
         // Returnera map med alla spelare i gameroomets positioner
     }
 
-    private boolean hasPlayerColided(Player player, GameRoom gameRoom) {
+    private boolean hasPlayerCollided(Player player, GameRoom gameRoom) {
         // kolla om spelare har krockat igenom att kolla spelarens position är och
         // jämför med befintliga positioner i gameRoomets lista
-        return false; // temporär return för att kunna sätta igång servern
+
+        // Skapa DTO att jämföra med
+        PositionDTO playerPosition = new PositionDTO(player.getCurrentX(), player.getCurrentY());
+
+        boolean hasCollidedWithOtherPlayer = gameRoom.getPreviousPositions().containsKey(playerPosition);
+        boolean hasCollidedWithWall = (playerPosition.x() < 0 // left wall
+                || playerPosition.x() >= gameRoom.getGridSize() // right wall
+                || playerPosition.y() < 0 // upper wall
+                || playerPosition.y() >= gameRoom.getGridSize()); // lower wall
+
+        return hasCollidedWithOtherPlayer || hasCollidedWithWall;
     }
 
     public Player checkWinner(GameRoom gameRoom) {
@@ -161,6 +214,18 @@ public class GameService {
             return winner;
         }
         return null;
+    }
+
+    public void activateDash(DashDTO dashDTO) {
+        Player player = getPlayerById(dashDTO.playerId(), dashDTO.gameRoomId());
+        int ticksOfDash = 50; // adjust this later.
+        if (player.getDashesLeft() <= 0)
+            return; // No more dashes left
+
+        player.setCurrentDashTicksLeft(player.getCurrentDashTicksLeft() + ticksOfDash);
+
+        // decrement dashes left
+        player.setDashesLeft(player.getDashesLeft() - 1);
     }
 
     // Detta är lite till för att frontend bara behöver veta färgen på vinnaren typ
@@ -201,8 +266,8 @@ public class GameService {
         gameRoom.setGameRoomStatus(GameState.NOT_STARTED);
         gameRoom.setMaxPlayers(createGameRoomDTO.getMaxPlayers());
         gameRoom.setGameRoomOwner(createGameRoomDTO.getClientId());
-        gameRoom.setGridSize(createGameRoomDTO.getMaxPlayers() * 64);// Sätter gridsize baserat på max antal spelare. 4
-                                                                     // = 256, 10 = 640, 15 =
+        gameRoom.setGridSize(4 * 64);// Sätter gridsize baserat på max antal spelare. 4
+                                     // = 256, 10 = 640, 15 =
         // 960 etc.
         String gameRoomId = UUID.randomUUID().toString();
         gameRoom.setGameRoomId(gameRoomId);
@@ -211,7 +276,7 @@ public class GameService {
         return gameRoom;
     }
 
-    public void deleteAllGameRooms(){
+    public void deleteAllGameRooms() {
         gameRoomList = new ArrayList<>();
     }
 
@@ -220,10 +285,10 @@ public class GameService {
         GameRoom gameRoom = getGameRoomById(gameRoomId);
 
         // Kolla om maxgräns redan är uppnådd
-        if (gameRoom.getPlayers().size() >= gameRoom.getMaxPlayers()){
+        if (gameRoom.getPlayers().size() >= gameRoom.getMaxPlayers()) {
             return null;
         }
-        
+
         // skapa spelare
         Player player = new Player();
         asignColorToPlayer(player, gameRoomId);
@@ -251,40 +316,39 @@ public class GameService {
         player.setColor(asignColor);
     }
 
-    public void distributePlayers(String gameRoomId){
+    public void distributePlayers(String gameRoomId) {
         double degreesOffset = 0;
-        int padding = 10; // Minimum amount of 'pixels' from the wall that a player can spawn at
+        int padding = 30; // Minimum amount of 'pixels' from the wall that a player can spawn at
 
         // Get grid size and how many players there are
         GameRoom gameRoom = getGameRoomById(gameRoomId);
         int gridSize = gameRoom.getGridSize();
         int playerCount = gameRoom.getPlayers().size();
-        
-        if (playerCount == 0) return; // will cause division by 0 otherwise
+
+        if (playerCount == 0)
+            return; // will cause division by 0 otherwise
 
         // Get degrees between each player
-        double degreesBetweenPlayers = 360.0/playerCount;
+        double degreesBetweenPlayers = 360.0 / playerCount;
 
         // compute radius, given gridSize and padding
-        double diameter = gridSize - 2*padding; // remove one padding on each side
-        double radius = (double) diameter/2;
+        double diameter = gridSize - 2 * padding; // remove one padding on each side
+        double radius = (double) diameter / 2;
 
         // Get center position (roughly)
         PositionDTO center = new PositionDTO(
-            (int) (gridSize / 2),
-            (int) (gridSize / 2)
-        );
-        
-        // Get points on a circle within the grid size (with some padding on the sides), 
+                (int) (gridSize / 2),
+                (int) (gridSize / 2));
+
+        // Get points on a circle within the grid size (with some padding on the sides),
         // and convert them into integer positions x and y
         int currentPlayerIndex = 0;
-        for (Player player : gameRoom.getPlayers().values()){
+        for (Player player : gameRoom.getPlayers().values()) {
             // generate position
-            double positionAngle = currentPlayerIndex*degreesBetweenPlayers + degreesOffset;
+            double positionAngle = currentPlayerIndex * degreesBetweenPlayers + degreesOffset;
             PositionDTO playerPosition = new PositionDTO(
-                (int) (center.x() + Math.cos(Math.toRadians(positionAngle))* radius),
-                (int) (center.y() + Math.sin(Math.toRadians(positionAngle)) * radius)
-            );
+                    (int) (center.x() + Math.cos(Math.toRadians(positionAngle)) * radius),
+                    (int) (center.y() + Math.sin(Math.toRadians(positionAngle)) * radius));
             // set players position
             player.setCurrentX(playerPosition.x());
             player.setCurrentY(playerPosition.y());
@@ -301,5 +365,11 @@ public class GameService {
             gameRoom.setGameRoomStatus(setGameRoomStatusDTO.gameState());
         }
         return gameRoom;
+    }
+
+    public void deleteGameRoomById(String gameRoomId) {
+
+        gameRoomList.remove(getGameRoomById(gameRoomId));
+
     }
 }
