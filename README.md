@@ -1,6 +1,6 @@
 # Snake Attack Server
 
-[screenshot of gameplay]
+![Gameplay](./assets/gameplay.gif)
 
 This is the server for a educational project for a class in Java25. It is a small game where you navigate a grid with other players while painting a line behing you. Survive by avoiding others' and your own trail and the walls. Last to survive wins the game.
 
