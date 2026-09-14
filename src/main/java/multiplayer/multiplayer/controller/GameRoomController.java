@@ -2,12 +2,12 @@ package multiplayer.multiplayer.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import multiplayer.multiplayer.Service.GameRoomService;
 import multiplayer.multiplayer.Service.GameService;
 import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
@@ -16,15 +16,12 @@ import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
 import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
-import tools.jackson.databind.util.JSONPObject;
 
 import org.springframework.web.bind.annotation.RequestBody;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 
@@ -34,14 +31,17 @@ public class GameRoomController {
 
     private final GameService gameService;
 
-    public GameRoomController(GameService gameService) {
+    private final GameRoomService gameRoomService;
+
+    public GameRoomController(GameService gameService, GameRoomService gameRoomService) {
         this.gameService = gameService;
+        this.gameRoomService = gameRoomService;
     }
 
     // Skapar Gameroom och knyter det till clientens ID
     @PostMapping("/gameRooms")
     public GameRoomDisplayDTO createGameRoom(@RequestBody CreateGameRoomDTO createGameRoomDTO) {
-        GameRoom gameRoom = gameService.createGameRoom(createGameRoomDTO);
+        GameRoom gameRoom = gameRoomService.createGameRoom(createGameRoomDTO);
         GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper.toDisplayDTO(gameRoom);
         return gameRoomDisplayDTO;
     }
@@ -66,10 +66,10 @@ public class GameRoomController {
             return ResponseEntity.badRequest().build();
         } else {
             GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
-                    .toDisplayDTO(gameService.getGameRoomById(gameRoomId));
+                    .toDisplayDTO(gameRoomService.getGameRoomById(gameRoomId));
             GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO,
                     player.getColor());
-            if (clientId.replaceAll("\"", "").equals(gameService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
+            if (clientId.replaceAll("\"", "").equals(gameRoomService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
                 gameRoomJoinDTO.setOwner(true);
                 System.out.println("Owner was set to true!");
             }
@@ -80,17 +80,17 @@ public class GameRoomController {
     // Används för postman, kan behövas i framtiden.
     @GetMapping("/gameRooms")
     public List<GameRoom> getMethodName() {
-        return gameService.getAllGameRooms();
+        return gameRoomService.getAllGameRooms();
     }
 
     @PatchMapping("/gameroom/start")
     public GameRoom startGameRoom(@RequestBody SetGameRoomStatusDTO setGameRoomStatusDTO) {
-        return gameService.startGameRoom(setGameRoomStatusDTO);
+        return gameRoomService.startGameRoom(setGameRoomStatusDTO);
     }
 
     @DeleteMapping("/gameRooms")
     public ResponseEntity<Void> deleteGameRooms() {
-        gameService.deleteAllGameRooms();
+        gameRoomService.deleteAllGameRooms();
         return ResponseEntity.ok().build();
     }
 
