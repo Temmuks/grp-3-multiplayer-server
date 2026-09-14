@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import multiplayer.multiplayer.dto.CreateGameRoomDTO;
+import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
 import multiplayer.multiplayer.dto.TurnDTO;
+import multiplayer.multiplayer.enums.GameState;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 
@@ -101,11 +103,11 @@ class GameServiceTest {
         GameRoom room = gameRoomService.createGameRoom(new CreateGameRoomDTO("PlayerId", 4));
 
         Player player = gameService.createPlayer(room.getGameRoomId());
-
+        
         String PlayerId = player.getPlayerId();
-
+        
         Player result = gameService.getPlayerById(PlayerId, room.getGameRoomId());
-
+        
         assertEquals(PlayerId, result.getPlayerId());
     }
     // Testar att en spelare med aktiv dash rör sig 2 steg istället för 1 när applyMovement körs.
@@ -135,5 +137,41 @@ class GameServiceTest {
         assertEquals(12, player.getCurrentX());
         assertEquals(20, player.getCurrentY());
         assertEquals(49, player.getCurrentDashTicksLeft());
+    
+    @Test
+    void shouldKillCollidingPlayerOnCollision(){
+        GameRoomService gameRoomService = new GameRoomService();
+    
+        GameService gameService = new GameService(gameRoomService);
+        String clientId = "clientid";
+        GameRoom room = gameRoomService.createGameRoom(new CreateGameRoomDTO(clientId, 4));
+    
+        // create players
+        Player player1 = gameService.createPlayer(room.getGameRoomId());
+        Player collidingPlayer = gameService.createPlayer(room.getGameRoomId());
+        
+        // Set positions and directions
+        player1.setDirection("down");
+        player1.setCurrentX(3);
+        player1.setCurrentY(1);
+        
+        collidingPlayer.setDirection("right");
+        collidingPlayer.setCurrentX(0);
+        collidingPlayer.setCurrentY(1);
+
+        // Both players should be alive
+        gameService.tick(room.getGameRoomId());
+        assertTrue(collidingPlayer.isAlive());
+        assertTrue(player1.isAlive());
+        
+        // Both players should be alive
+        gameService.tick(room.getGameRoomId());
+        assertTrue(collidingPlayer.isAlive());
+        assertTrue(player1.isAlive());
+        
+        // The colliding player should not be alive after this tick
+        gameService.tick(room.getGameRoomId());
+        assertFalse(collidingPlayer.isAlive());
+        assertTrue(player1.isAlive());
     }
 }
