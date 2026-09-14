@@ -39,4 +39,16 @@ The tests mainly cover player movements, such as only being able to move when al
 * CORS is wide open
 * Method broadcastGameRoomList on is a rixed schedule of 500ms. This is somewhat wasteful, and should be rewritten to only be called whenever any data in the list of gameRooms change.
 
+## Team
+[**Boren90**](https://github.com/Boren90)
+<br>
+<br>
+[**Temmuks**](https://github.com/Temmuks)
+<br>
+<br>
+[**williameliasson**](https://github.com/williameliasson)
+<br>
+<br>
+[**WWolfburg**](https://github.com/WWolfburg)
+
 [Client repo](https://github.com/Temmuks/grp-3-multiplayer-client)
