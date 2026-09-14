@@ -1,8 +1,13 @@
 package multiplayer.multiplayer.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+
 public class CreateGameRoomDTO {
 
     private String clientId;
+    @Min(value = 2, message = "Min players must be at least 2")
+    @Max(value = 15, message = "Max players must be at most 15")
     private int maxPlayers;
 
     public CreateGameRoomDTO() {
