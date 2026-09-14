@@ -137,6 +137,7 @@ class GameServiceTest {
         assertEquals(12, player.getCurrentX());
         assertEquals(20, player.getCurrentY());
         assertEquals(49, player.getCurrentDashTicksLeft());
+    }
     
     @Test
     void shouldKillCollidingPlayerOnCollision(){
