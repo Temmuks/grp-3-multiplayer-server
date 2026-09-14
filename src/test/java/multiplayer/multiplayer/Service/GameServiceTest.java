@@ -114,7 +114,7 @@ class GameServiceTest {
     // Om currentDashTicksLeft > 0 sätts movementAmount = 2
     // Testar även att currentDashTicksLeft minskas med 1 efter movement.
     @Test
-    void shouldMovePlayerTwoStepsWhenDashing() {
+    void shouldMovePlayerTwoStepsWhenDashingPerTick() {
         // Arrange
         GameRoomService gameRoomService = new GameRoomService();
         GameService gameService = new GameService(gameRoomService);
