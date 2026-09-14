@@ -108,4 +108,32 @@ class GameServiceTest {
 
         assertEquals(PlayerId, result.getPlayerId());
     }
+    // Testar att en spelare med aktiv dash rör sig 2 steg istället för 1 när applyMovement körs.
+    // Om currentDashTicksLeft > 0 sätts movementAmount = 2
+    // Testar även att currentDashTicksLeft minskas med 1 efter movement.
+    @Test
+    void shouldMovePlayerTwoStepsWhenDashing() {
+        // Arrange
+        GameRoomService gameRoomService = new GameRoomService();
+        GameService gameService = new GameService(gameRoomService);
+
+        GameRoom room = gameRoomService.createGameRoom(
+                new CreateGameRoomDTO("owner-1", 4));
+
+        Player player = gameService.createPlayer(room.getGameRoomId());
+        player.setCurrentX(10);
+        player.setCurrentY(20);
+        player.setDirection("right");
+        player.setAlive(true);
+        player.setCurrentDashTicksLeft(50);
+
+        // Act
+        boolean moved = gameService.applyMovement(player);
+
+        // Assert
+        assertTrue(moved);
+        assertEquals(12, player.getCurrentX());
+        assertEquals(20, player.getCurrentY());
+        assertEquals(49, player.getCurrentDashTicksLeft());
+    }
 }
