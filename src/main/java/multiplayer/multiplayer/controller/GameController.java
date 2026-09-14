@@ -3,6 +3,7 @@ package multiplayer.multiplayer.controller;
 import org.springframework.stereotype.Controller;
 
 import multiplayer.multiplayer.mapper.GameRoomMapper;
+import multiplayer.multiplayer.Service.GameRoomService;
 import multiplayer.multiplayer.Service.GameService;
 import multiplayer.multiplayer.dto.DashDTO;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
@@ -19,24 +20,28 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 @Controller
 public class GameController {
+
     private SimpMessagingTemplate messagingTemplate;
     private GameService gameService;
+    private GameRoomService gameRoomService;
 
-    public GameController(SimpMessagingTemplate messagingTemplate, GameService gameService) {
+    public GameController(SimpMessagingTemplate messagingTemplate, GameService gameService,
+            GameRoomService gameRoomService) {
         this.messagingTemplate = messagingTemplate;
         this.gameService = gameService;
+        this.gameRoomService = gameRoomService;
     }
 
     // Gameloop som med en satt intervall updaterar klienten med nya positioner
     @Scheduled(fixedRate = 60)
     public void gameTick() {
 
-        gameService.getAllGameRooms().forEach(gameRoom -> {
+        gameRoomService.getAllGameRooms().forEach(gameRoom -> {
             if (!gameRoom.getGameRoomStatus().equals(GameState.NOT_STARTED)) {
                 GameRoomUpdateDTO gameRoomUpdateDTO = gameService.tick(gameRoom.getGameRoomId());
                 if (gameRoom.getGameRoomStatus().equals(GameState.FINISHED)) {
                     gameRoomUpdateDTO.setWinnerColor(gameService.getWinnerColor(gameRoom));
-                    gameService.deleteGameRoomById(gameRoom.getGameRoomId());
+                    gameRoomService.deleteGameRoomById(gameRoom.getGameRoomId());
                 }
                 messagingTemplate.convertAndSend("/topic/game/" + gameRoom.getGameRoomId(), gameRoomUpdateDTO);
             }
@@ -49,7 +54,7 @@ public class GameController {
     @Scheduled(fixedRate = 500)
     public void broadcastGameRoomList() {
         // get all gamerooms
-        List<GameRoom> gameRooms = gameService.getAllGameRooms();
+        List<GameRoom> gameRooms = gameRoomService.getAllGameRooms();
 
         // convert into displayable format (dont send entire gamerooms)
         List<GameRoomDisplayDTO> DTOs = gameRooms.stream()
