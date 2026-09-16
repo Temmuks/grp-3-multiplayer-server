@@ -30,13 +30,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 // @CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5174" })
 public class GameRoomController {
 
+    private final GameController gameController;
+
     private final GameService gameService;
 
     private final GameRoomService gameRoomService;
 
-    public GameRoomController(GameService gameService, GameRoomService gameRoomService) {
+    public GameRoomController(GameService gameService, GameRoomService gameRoomService, GameController gameController) {
         this.gameService = gameService;
         this.gameRoomService = gameRoomService;
+        this.gameController = gameController;
     }
 
     // Skapar Gameroom och knyter det till clientens ID
@@ -66,6 +69,8 @@ public class GameRoomController {
         if (player == null) {
             return ResponseEntity.badRequest().build();
         } else {
+            // Let subscribers of /topic/game/{gameRoomId}/playerjoin that a new player has joined, and what color
+            gameController.sendNewPlayerJoinedMessage(gameRoomId, player.getColor());
             GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
                     .toDisplayDTO(gameRoomService.getGameRoomById(gameRoomId));
             GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO,
