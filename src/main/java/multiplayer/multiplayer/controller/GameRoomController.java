@@ -14,6 +14,7 @@ import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.dto.GameRoomJoinDTO;
 import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
+import multiplayer.multiplayer.enums.GameState;
 import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
@@ -61,21 +62,26 @@ public class GameRoomController {
     @PostMapping("/join/{gameRoomId}")
 
     public ResponseEntity<GameRoomJoinDTO> joinGameRoom(@PathVariable String gameRoomId, @RequestBody String clientId) {
-        Player player = gameService.createPlayer(gameRoomId);
-        boolean isOwner = false;
-        if (player == null) {
-            return ResponseEntity.badRequest().build();
-        } else {
-            GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
-                    .toDisplayDTO(gameRoomService.getGameRoomById(gameRoomId));
-            GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO,
-                    player.getColor());
-            if (clientId.replaceAll("\"", "").equals(gameRoomService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
-                gameRoomJoinDTO.setOwner(true);
-                System.out.println("Owner was set to true!");
+        if (gameRoomService.getGameRoomById(gameRoomId).getGameRoomStatus().equals(GameState.NOT_STARTED)) {
+
+            Player player = gameService.createPlayer(gameRoomId);
+            boolean isOwner = false;
+            if (player == null) {
+                return ResponseEntity.badRequest().build();
+            } else {
+                GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
+                        .toDisplayDTO(gameRoomService.getGameRoomById(gameRoomId));
+                GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO,
+                        player.getColor());
+                if (clientId.replaceAll("\"", "")
+                        .equals(gameRoomService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
+                    gameRoomJoinDTO.setOwner(true);
+                    System.out.println("Owner was set to true!");
+                }
+                return ResponseEntity.ok(gameRoomJoinDTO);
             }
-            return ResponseEntity.ok(gameRoomJoinDTO);
         }
+        return ResponseEntity.badRequest().build();
     }
 
     // Används för postman, kan behövas i framtiden.
