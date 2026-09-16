@@ -31,13 +31,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 // @CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5174" })
 public class GameRoomController {
 
+    private final GameController gameController;
+
     private final GameService gameService;
 
     private final GameRoomService gameRoomService;
 
-    public GameRoomController(GameService gameService, GameRoomService gameRoomService) {
+    public GameRoomController(GameService gameService, GameRoomService gameRoomService, GameController gameController) {
         this.gameService = gameService;
         this.gameRoomService = gameRoomService;
+        this.gameController = gameController;
     }
 
     // Skapar Gameroom och knyter det till clientens ID
@@ -62,28 +65,33 @@ public class GameRoomController {
     @PostMapping("/join/{gameRoomId}")
 
     public ResponseEntity<GameRoomJoinDTO> joinGameRoom(@PathVariable String gameRoomId, @RequestBody String clientId) {
-        if (gameRoomService.getGameRoomById(gameRoomId).getGameRoomStatus().equals(GameState.NOT_STARTED)) {
+      if (gameRoomService.getGameRoomById(gameRoomId).getGameRoomStatus().equals(GameState.NOT_STARTED)) {
 
-            Player player = gameService.createPlayer(gameRoomId);
-            boolean isOwner = false;
-            if (player == null) {
-                return ResponseEntity.badRequest().build();
-            } else {
-                GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
-                        .toDisplayDTO(gameRoomService.getGameRoomById(gameRoomId));
-                GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO,
-                        player.getColor());
-                if (clientId.replaceAll("\"", "")
-                        .equals(gameRoomService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
-                    gameRoomJoinDTO.setOwner(true);
-                    System.out.println("Owner was set to true!");
-                }
-                return ResponseEntity.ok(gameRoomJoinDTO);
+        Player player = gameService.createPlayer(gameRoomId);
+        boolean isOwner = false;
+        if (player == null) {
+            return ResponseEntity.badRequest().build();
+        } else {
+            // Let subscribers of /topic/game/{gameRoomId}/playerjoin that a new player has joined, and what color
+            gameController.sendNewPlayerJoinedMessage(gameRoomId, player.getColor());
+            GameRoom gameroom = gameRoomService.getGameRoomById(gameRoomId);
+            GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
+                    .toDisplayDTO(gameroom);
+            GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(
+                gameroom.getMaxPlayers(),
+                player.getPlayerId(),
+                isOwner, 
+                gameRoomDisplayDTO,
+                player.getColor());
+            if (clientId.replaceAll("\"", "").equals(gameRoomService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
+                gameRoomJoinDTO.setOwner(true);
+                System.out.println("Owner was set to true!");
             }
         }
+      }
         return ResponseEntity.badRequest().build();
     }
-
+    
     // Används för postman, kan behövas i framtiden.
     @GetMapping("/gameRooms")
     public List<GameRoom> getMethodName() {
@@ -95,10 +103,9 @@ public class GameRoomController {
         return gameRoomService.startGameRoom(setGameRoomStatusDTO);
     }
 
-    @DeleteMapping("/gameRooms")
-    public ResponseEntity<Void> deleteGameRooms() {
-        gameRoomService.deleteAllGameRooms();
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/owner/gameRooms/{clientId}")
+    public void deleteOwnerRooms(@PathVariable String clientId) {
+        gameRoomService.deleteOwnerRooms(clientId);
     }
 
 }
