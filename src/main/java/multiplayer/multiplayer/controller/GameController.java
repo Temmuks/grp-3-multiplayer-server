@@ -15,7 +15,6 @@ import multiplayer.multiplayer.model.GameRoom;
 import java.util.List;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -77,7 +76,7 @@ public class GameController {
         gameService.activateDash(dashDTO);
     }
 
-    public void sendNewPlayerJoinedMessage(String gameRoomId, String color){
+    public void sendNewPlayerJoinedMessage(String gameRoomId, String color) {
         messagingTemplate.convertAndSend("/topic/game/" + gameRoomId + "/playerjoin", color);
     }
 
