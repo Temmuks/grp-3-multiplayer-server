@@ -1,13 +1,15 @@
 package multiplayer.multiplayer.dto;
 
 public class GameRoomJoinDTO {
+    int maxPlayers;
     String playerId;
     boolean isOwner;
     GameRoomDisplayDTO gameRoomDisplayDTO;
     String playerColor;
 
-    public GameRoomJoinDTO(String playerId, boolean isOwner, GameRoomDisplayDTO gameRoomDisplayDTO,
+    public GameRoomJoinDTO(int maxPlayers, String playerId, boolean isOwner, GameRoomDisplayDTO gameRoomDisplayDTO,
             String playerColor) {
+        this.maxPlayers = maxPlayers;
         this.playerId = playerId;
         this.isOwner = isOwner;
         this.gameRoomDisplayDTO = gameRoomDisplayDTO;
@@ -47,6 +49,14 @@ public class GameRoomJoinDTO {
 
     public void setPlayerColor(String playerColor) {
         this.playerColor = playerColor;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
     }
 
 }

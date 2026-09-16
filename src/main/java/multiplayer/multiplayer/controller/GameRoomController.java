@@ -71,10 +71,15 @@ public class GameRoomController {
         } else {
             // Let subscribers of /topic/game/{gameRoomId}/playerjoin that a new player has joined, and what color
             gameController.sendNewPlayerJoinedMessage(gameRoomId, player.getColor());
+            GameRoom gameroom = gameRoomService.getGameRoomById(gameRoomId);
             GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
-                    .toDisplayDTO(gameRoomService.getGameRoomById(gameRoomId));
-            GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(player.getPlayerId(), isOwner, gameRoomDisplayDTO,
-                    player.getColor());
+                    .toDisplayDTO(gameroom);
+            GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(
+                gameroom.getMaxPlayers(),
+                player.getPlayerId(),
+                isOwner, 
+                gameRoomDisplayDTO,
+                player.getColor());
             if (clientId.replaceAll("\"", "").equals(gameRoomService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
                 gameRoomJoinDTO.setOwner(true);
                 System.out.println("Owner was set to true!");
