@@ -77,8 +77,8 @@ public class GameController {
         gameService.activateDash(dashDTO);
     }
 
-    public void sendNewPlayerJoinedMessage(String gameRoomId, String color){
-        messagingTemplate.convertAndSend("/topic/game/" + gameRoomId + "/playerjoin", color);
+    public void sendNewPlayerJoinedMessage(String gameRoomId, List<String> colors){
+        messagingTemplate.convertAndSend("/topic/game/" + gameRoomId + "/playerjoin", colors);
     }
 
 }

@@ -1,22 +1,34 @@
 package multiplayer.multiplayer.dto;
 
+import java.util.List;
+
 public class GameRoomJoinDTO {
     int maxPlayers;
     String playerId;
+    List<String> playerColors;
     boolean isOwner;
     GameRoomDisplayDTO gameRoomDisplayDTO;
     String playerColor;
 
-    public GameRoomJoinDTO(int maxPlayers, String playerId, boolean isOwner, GameRoomDisplayDTO gameRoomDisplayDTO,
+    public GameRoomJoinDTO(int maxPlayers, String playerId, List<String> playerColors, boolean isOwner, GameRoomDisplayDTO gameRoomDisplayDTO,
             String playerColor) {
         this.maxPlayers = maxPlayers;
         this.playerId = playerId;
+        this.playerColors = playerColors;
         this.isOwner = isOwner;
         this.gameRoomDisplayDTO = gameRoomDisplayDTO;
         this.playerColor = playerColor;
     }
 
     public GameRoomJoinDTO() {
+    }
+
+    public List<String> getPlayerColors() {
+        return playerColors;
+    }
+
+    public void setPlayerColors(List<String> playerColors) {
+        this.playerColors = playerColors;
     }
 
     public String getPlayerId() {

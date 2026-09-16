@@ -69,14 +69,22 @@ public class GameRoomController {
         if (player == null) {
             return ResponseEntity.badRequest().build();
         } else {
-            // Let subscribers of /topic/game/{gameRoomId}/playerjoin that a new player has joined, and what color
-            gameController.sendNewPlayerJoinedMessage(gameRoomId, player.getColor());
             GameRoom gameroom = gameRoomService.getGameRoomById(gameRoomId);
+            
+            // Let subscribers of /topic/game/{gameRoomId}/playerjoin that a new player has joined, and what color, (and the previous players' colors)
+            List<String> playerColors = gameroom.getPlayers().values().stream()
+                .sorted((p1, p2) -> p1.getCreatedAt().compareTo(p2.getCreatedAt())) // Make it easier to see what color joined, as they will appear last in the list
+                .map(p -> p.getColor())
+                .toList();
+            
+            gameController.sendNewPlayerJoinedMessage(gameRoomId, playerColors);
+            
             GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
                     .toDisplayDTO(gameroom);
             GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(
                 gameroom.getMaxPlayers(),
                 player.getPlayerId(),
+                playerColors,
                 isOwner, 
                 gameRoomDisplayDTO,
                 player.getColor());

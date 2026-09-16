@@ -1,5 +1,6 @@
 package multiplayer.multiplayer.model;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +20,8 @@ public class Player {
 
     int dashesLeft = 3;
 
+    Instant createdAt = Instant.now();
+
     // TBD
     // int points;
     // TBD
@@ -33,6 +36,7 @@ public class Player {
         this.color = color;
         this.currentDashTicksLeft = currentDashTicksLeft;
         this.dashesLeft = dashesLeft;
+        
     }
 
     public Player() {
@@ -101,6 +105,14 @@ public class Player {
     
     public void setDashesLeft(int dashesLeft) {
         this.dashesLeft = dashesLeft;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
     
 }
