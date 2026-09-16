@@ -64,10 +64,6 @@ public class GameRoomService {
         return gameRoom;
     }
 
-    // Radera alla GameRooms
-    public void deleteAllGameRooms() {
-        gameRoomList = new ArrayList<>();
-    }
 
     // Radera specifikt GameRoom
     public void deleteGameRoomById(String gameRoomId) {

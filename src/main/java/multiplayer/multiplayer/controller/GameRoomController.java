@@ -89,12 +89,6 @@ public class GameRoomController {
         return gameRoomService.startGameRoom(setGameRoomStatusDTO);
     }
 
-    @DeleteMapping("/gameRooms")
-    public ResponseEntity<Void> deleteGameRooms() {
-        gameRoomService.deleteAllGameRooms();
-        return ResponseEntity.ok().build();
-    }
-
     @DeleteMapping("/owner/gameRooms/{clientId}")
     public void deleteOwnerRooms(@PathVariable String clientId) {
         gameRoomService.deleteOwnerRooms(clientId);
