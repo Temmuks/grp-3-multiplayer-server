@@ -95,4 +95,9 @@ public class GameRoomController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/owner/gameRooms/{clientId}")
+    public void deleteOwnerRooms(@PathVariable String clientId) {
+        gameRoomService.deleteOwnerRooms(clientId);
+    }
+
 }

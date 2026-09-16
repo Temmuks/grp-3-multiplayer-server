@@ -43,6 +43,10 @@ public class GameRoomService {
         return gameRoomList;
     }
 
+    public void deleteOwnerRooms(String clientId) {
+        gameRoomList.removeIf(gameRoom -> gameRoom.getGameRoomOwner().equals(clientId));
+    }
+
     // Hämta speciofikt GameRoom
     public GameRoom getGameRoomById(String gameRoomId) {
         GameRoom gameRoomById = gameRoomList.stream().filter(gr -> gr.getGameRoomId().equals(gameRoomId)).findFirst()
@@ -114,4 +118,5 @@ public class GameRoomService {
             currentPlayerIndex++;
         }
     }
+
 }
