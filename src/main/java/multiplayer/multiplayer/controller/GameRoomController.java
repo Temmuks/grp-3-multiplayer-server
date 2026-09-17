@@ -14,11 +14,13 @@ import multiplayer.multiplayer.dto.CreateGameRoomDTO;
 import multiplayer.multiplayer.dto.GameRoomDisplayDTO;
 import multiplayer.multiplayer.dto.GameRoomJoinDTO;
 import multiplayer.multiplayer.dto.SetGameRoomStatusDTO;
+import multiplayer.multiplayer.enums.GameState;
 import multiplayer.multiplayer.mapper.GameRoomMapper;
 import multiplayer.multiplayer.model.GameRoom;
 import multiplayer.multiplayer.model.Player;
 
 import org.springframework.web.bind.annotation.RequestBody;
+import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -64,36 +66,39 @@ public class GameRoomController {
     @PostMapping("/join/{gameRoomId}")
 
     public ResponseEntity<GameRoomJoinDTO> joinGameRoom(@PathVariable String gameRoomId, @RequestBody String clientId) {
-        Player player = gameService.createPlayer(gameRoomId);
-        boolean isOwner = false;
-        if (player == null) {
-            return ResponseEntity.badRequest().build();
-        } else {
-            GameRoom gameroom = gameRoomService.getGameRoomById(gameRoomId);
-            
-            // Let subscribers of /topic/game/{gameRoomId}/playerjoin that a new player has joined, and what color, (and the previous players' colors)
-            List<String> playerColors = gameroom.getPlayers().values().stream()
-                .sorted((p1, p2) -> p1.getCreatedAt().compareTo(p2.getCreatedAt())) // Make it easier to see what color joined, as they will appear last in the list
-                .map(p -> p.getColor())
-                .toList();
-            
-            gameController.sendNewPlayerJoinedMessage(gameRoomId, playerColors);
-            
-            GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
-                    .toDisplayDTO(gameroom);
-            GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(
-                gameroom.getMaxPlayers(),
-                player.getPlayerId(),
-                playerColors,
-                isOwner, 
-                gameRoomDisplayDTO,
-                player.getColor());
-            if (clientId.replaceAll("\"", "").equals(gameRoomService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
-                gameRoomJoinDTO.setOwner(true);
-                System.out.println("Owner was set to true!");
+        if (gameRoomService.getGameRoomById(gameRoomId).getGameRoomStatus().equals(GameState.NOT_STARTED)) {
+            Player player = gameService.createPlayer(gameRoomId);
+            boolean isOwner = false;
+            if (player == null) {
+                return ResponseEntity.badRequest().build();
+            } else {
+                GameRoom gameroom = gameRoomService.getGameRoomById(gameRoomId);
+                
+                // Let subscribers of /topic/game/{gameRoomId}/playerjoin that a new player has joined, and what color, (and the previous players' colors)
+                List<String> playerColors = gameroom.getPlayers().values().stream()
+                    .sorted((p1, p2) -> p1.getCreatedAt().compareTo(p2.getCreatedAt())) // Make it easier to see what color joined, as they will appear last in the list
+                    .map(p -> p.getColor())
+                    .toList();
+                
+                gameController.sendNewPlayerJoinedMessage(gameRoomId, playerColors);
+                
+                GameRoomDisplayDTO gameRoomDisplayDTO = GameRoomMapper
+                        .toDisplayDTO(gameroom);
+                GameRoomJoinDTO gameRoomJoinDTO = new GameRoomJoinDTO(
+                    gameroom.getMaxPlayers(),
+                    player.getPlayerId(),
+                    playerColors,
+                    isOwner, 
+                    gameRoomDisplayDTO,
+                    player.getColor());
+                if (clientId.replaceAll("\"", "").equals(gameRoomService.getGameRoomById(gameRoomId).getGameRoomOwner())) {
+                    gameRoomJoinDTO.setOwner(true);
+                    System.out.println("Owner was set to true!");
+                }
+                return ResponseEntity.ok(gameRoomJoinDTO);
             }
-            return ResponseEntity.ok(gameRoomJoinDTO);
         }
+        return ResponseEntity.badRequest().build();
     }
 
     // Används för postman, kan behövas i framtiden.
