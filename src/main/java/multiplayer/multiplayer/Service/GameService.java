@@ -137,7 +137,7 @@ public class GameService {
             playerPositions.forEach(pcDTO -> {
                 newOccupiedPositions.put(pcDTO, player.getPlayerId());
             });
-            PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getPlayerId(), player.getColor(),
+            PlayerUpdateDTO playerUpdateDTO = new PlayerUpdateDTO(player.getColor(),
                     playerPositions);
 
             gameRoomUpdateDTO.getPlayerUpdateDTOList().add(playerUpdateDTO);
